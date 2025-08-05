@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Данные объявлений
-    const listingsData = [
+const listingsData = [
         {
             id: 1,
             title: "Помещение 10 м² 1 этаж",
@@ -35,10 +33,30 @@ document.addEventListener('DOMContentLoaded', function() {
             date: "2025-07-15"
         }
     ];
+document.addEventListener('DOMContentLoaded', function() {
+    // Данные объявлений
+
 
     // Инициализация
     renderListings(listingsData);
-    
+    document.querySelector('.close-btn').addEventListener('click', () => {
+    document.getElementById('modal').style.display = 'none';
+    });
+
+    // Закрытие по клику вне окна
+    window.addEventListener('click', (e) => {
+        const modal = document.getElementById('modal');
+        if (e.target === modal) {
+            modal.style.display = 'none';
+        }
+    });
+
+    // Форма бронирования
+    document.querySelector('.booking-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        alert('Спасибо! Ваша заявка на бронирование отправлена.');
+        document.getElementById('modal').style.display = 'none';
+    });
     // Обработчики фильтров
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
@@ -79,7 +97,15 @@ document.addEventListener('DOMContentLoaded', function() {
         applyFilters();
     });
 });
-
+// Функция для отображения названия города вместо кода
+function getCityName(cityCode) {
+    const cities = {
+        ufa: 'Уфа',
+        moscow: 'Москва',
+        spb: 'Санкт-Петербург'
+    };
+    return cities[cityCode] || cityCode;
+}
 // Функция фильтрации
 function applyFilters() {
     const priceMin = parseInt(document.getElementById('price-min').value) || 0;
@@ -140,25 +166,44 @@ function applyFilters() {
 
 function renderListings(listings) {
     const container = document.getElementById('listings-container');
-    
     if (listings.length === 0) {
         container.innerHTML = '<div class="no-results">Ничего не найдено. Измените параметры фильтрации.</div>';
         return;
     }
-    
+
     container.innerHTML = listings.map(listing => `
         <div class="listing">
             <img src="${listing.image}" alt="Фото помещения" class="listing-image">
             <div class="listing-content">
-                <h3>${listing.title}</h3>
+                <h3 class="listing-title">${listing.title}</h3>
                 <p class="listing-price">${listing.price.toLocaleString()} ₽/мес</p>
-                <p>${listing.description}</p>
+                <p class="listing-description">${listing.description}</p>
                 <p class="listing-address">${listing.address}</p>
                 <div class="listing-actions">
                     <button class="btn btn-primary">Забронировать</button>
-                    <button class="btn btn-secondary">Подробнее</button>
+                    <button class="btn btn-secondary" data-id="${listing.id}">Подробнее</button>
                 </div>
             </div>
         </div>
     `).join('');
+
+    // Добавляем обработчики для кнопок "Подробнее"
+    document.querySelectorAll('.btn-secondary[data-id]').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const id = parseInt(this.getAttribute('data-id'));
+            const listing = listingsData.find(item => item.id === id);
+
+            if (listing) {
+                document.querySelector('.modal-title').textContent = listing.title;
+                document.querySelector('.modal-price').textContent = `${listing.price.toLocaleString()} ₽/мес`;
+                document.querySelector('.modal-description').textContent = listing.description;
+                document.querySelector('.modal-city').textContent = `Город: ${getCityName(listing.city)}`;
+                document.querySelector('.modal-address').textContent = `Адрес: ${listing.address}`;
+                document.querySelector('.modal-image').src = listing.image;
+
+                // Показываем модальное окно
+                document.getElementById('modal').style.display = 'flex';
+            }
+        });
+    });
 }
