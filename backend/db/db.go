@@ -11,7 +11,7 @@ import (
 var DB *sql.DB
 
 func Connect() {
-	connStr := "host=localhost port=5432 user=postgres password=123 dbname=arenda sslmode=disable"
+	connStr := "host=localhost port=5432 user=postgres password=2374ural dbname=arenda sslmode=disable"
 	var err error
 	DB, err = sql.Open("postgres", connStr)
 	if err != nil {
@@ -29,12 +29,12 @@ func Connect() {
 // -------------------- добавляем структуру --------------------
 
 type Listing struct {
-	Type        string `json:"type"`
-	City        string `json:"city"`
-	Address     string `json:"address"`
-	Price       string `json:"price"`
-	Comment     string `json:"comment"`
-	UserID      int    `json:"user_id"`
+	Type    string `json:"type"`
+	City    string `json:"city"`
+	Address string `json:"address"`
+	Price   string `json:"price"`
+	Comment string `json:"comment"`
+	UserID  int    `json:"user_id"`
 }
 
 // -------------------- функция сохранения --------------------
