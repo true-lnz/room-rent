@@ -3,7 +3,9 @@ package handlers
 import (
 	"backend/db"
 	"encoding/json"
+	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -70,6 +72,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Создание JWT-токена
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": creds.Email,
 		"exp":   time.Now().Add(24 * time.Hour).Unix(),
@@ -81,7 +84,36 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Установка куки
+	http.SetCookie(w, &http.Cookie{
+		Name:     "session_token",
+		Value:    tokenString,
+		Path:     "/",
+		HttpOnly: true,                 // Можно false, если хочешь видеть в JS
+		SameSite: http.SameSiteLaxMode, // защищает от CSRF, но не блокирует переходы
+		Expires:  time.Now().Add(24 * time.Hour),
+	})
+
+	// Отправка ответа (можно оставить, если фронтенд использует)
 	json.NewEncoder(w).Encode(map[string]string{
 		"token": tokenString,
 	})
+}
+
+func AddListingHandler(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("session_token")
+	if err != nil || cookie.Value == "" {
+		http.Redirect(w, r, "/frontend/authorization/authorization.html", http.StatusSeeOther)
+		return
+	}
+
+	path := "../frontend/add_listing/add-listing.html"
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		log.Println("Файл НЕ НАЙДЕН:", path)
+		http.Error(w, "Файл не найден", http.StatusNotFound)
+		return
+	}
+
+	log.Println("Файл найден:", path)
+	http.ServeFile(w, r, path)
 }

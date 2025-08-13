@@ -120,7 +120,7 @@
       const data = await res.json();
       localStorage.setItem("token", data.token); // сохраняем токен
       alert("Вход выполнен!");
-      window.location.href = "/mainpage/mainpage.html";
+      window.location.href = "/frontend/mainpage/mainpage.html";
     } else {
       const err = await res.text();
       alert("Ошибка: " + err);

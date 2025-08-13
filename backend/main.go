@@ -15,10 +15,14 @@ func main() {
 	// Подключение хендлеров
 	http.HandleFunc("/api/register", withCORS(handlers.Register))
 	http.HandleFunc("/api/login", withCORS(handlers.Login))
+	http.HandleFunc("/api/add-listing", withCORS(handlers.SaveListing))
 
-	// Путь к папке frontend
-	fs := http.FileServer(http.Dir("../frontend"))
-	http.Handle("/", fs)
+	// Подключаем директорию frontend
+	http.Handle("/frontend/", http.StripPrefix("/frontend/", http.FileServer(http.Dir("../frontend"))))
+
+	// Защищённый маршрут для добавления объявления
+	http.HandleFunc("/add", handlers.AddListingHandler)
+
 
 	log.Println("Сервер запущен на http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
