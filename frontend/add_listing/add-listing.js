@@ -1,33 +1,37 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("listing-form"); // ID формы должен быть listing-form
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('listing-form');
+    const imageUploadInput = document.getElementById('image-upload');
+    const previewImage = document.getElementById('preview-image');
 
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+    // Обработка загрузки изображения
+    imageUploadInput.addEventListener('change', function () {
+        const file = this.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
-        const listingData = {
-            type: document.getElementById("type").value,
-            city: document.getElementById("city").value,
-            address: document.getElementById("address").value,
-            price: document.getElementById("price").value,
-            description: document.getElementById("description").value,
-            comment: document.getElementById("comment").value,
-            user_id: 7 // <-- Временно ставим 7
-        };
+    // Клик по изображению = открыть выбор файла
+    previewImage.addEventListener('click', () => {
+        imageUploadInput.click();
+    });
 
-        try {
-            const response = await fetch("/api/add-listing", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(listingData)
-            });
+    // Отправка формы
+    form.addEventListener('submit', function (e) {
+        e.preventDefault(); // Блокируем стандартную отправку
 
-            const result = await response.text();
-            alert(result);
-        } catch (error) {
-            console.error("Ошибка при отправке:", error);
-            alert("Ошибка при добавлении объявления.");
+        // Проверяем валидность формы
+        if (form.checkValidity()) {
+            alert('✅ Объявление успешно добавлено!');
+            form.reset(); // Очищаем форму
+            previewImage.src = 'https://via.placeholder.com/200'; // Сброс изображения
+        } else {
+            // Показываем стандартные подсказки браузера
+            form.reportValidity();
         }
     });
 });
