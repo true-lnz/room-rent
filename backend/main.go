@@ -22,7 +22,7 @@ func main() {
 
 	// Защищённый маршрут для добавления объявления
 	http.HandleFunc("/add", handlers.AddListingHandler)
-
+	http.HandleFunc("/add-listing", handlers.AddListingHandler)
 
 	log.Println("Сервер запущен на http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
