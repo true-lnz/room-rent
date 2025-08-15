@@ -20,9 +20,8 @@ func main() {
 	// Подключаем директорию frontend
 	http.Handle("/frontend/", http.StripPrefix("/frontend/", http.FileServer(http.Dir("../frontend"))))
 
-	// Защищённый маршрут для добавления объявления
+	// Защищённые маршруты для добавления объявления
 	http.HandleFunc("/add", handlers.AddListingHandler)
-	http.HandleFunc("/add-listing", handlers.AddListingHandler)
 
 	log.Println("Сервер запущен на http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", nil))
