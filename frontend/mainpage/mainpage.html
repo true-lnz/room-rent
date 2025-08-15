@@ -17,7 +17,7 @@
         <div class="main-nav">
             <a href="/" class="nav-btn">Главная</a>
             <a href="/listings" class="nav-btn">Все объявления</a>
-            <a href="/add" class="nav-btn">Добавить объявление</a>
+            <a href="/add-listing" class="nav-btn">Добавить объявление</a>
         </div>
     </div>
 
@@ -86,7 +86,24 @@
         <p>© 2025. Все права защищены</p>
         <a href="/privacy">Политика конфиденциальности</a>
     </footer>
-
+    <!-- Модальное окно -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="close-btn">&times;</button>
+            <h2 class="modal-title"></h2>
+            <p class="modal-price"></p>
+            <p class="modal-description"></p>
+            <p class="modal-city"></p>
+            <p class="modal-address"></p>
+            <img class="modal-image" src="" alt="Фото помещения" style="width: 100%; height: 180px; object-fit: cover; margin: 10px 0;">
+            <form class="booking-form">
+                <label>Выберите даты аренды:</label>
+                <input type="date" id="start-date" required>
+                <input type="date" id="end-date" required>
+                <button type="submit" class="btn btn-primary">Забронировать</button>
+            </form>
+        </div>
+    </div>
     <script src="mainpage.js"></script>
 </body>
 </html>
