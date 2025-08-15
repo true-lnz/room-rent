@@ -3,72 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Добавление объявления</title>
+    <title>Добавить объявление</title>
     <link rel="stylesheet" href="add-listing.css">
 </head>
 <body>
-    <!-- Header -->
+    <!-- Хедер -->
     <div class="header-nav">
-        <a href="/" class="nav-btn">Главная</a>
-        <a href="/listings" class="nav-btn">Все объявления</a>
-        <a href="/about" class="nav-btn">О компании</a>
-        <a href="/contacts" class="nav-btn">Контакты</a>
+        <a href="/frontend/mainpage/mainpage.html" class="nav-btn">Главная</a>
+        <a href="/frontend/mainpage/mainpage.html" class="nav-btn">Все объявления</a>
+        <a href="/frontend/personal_acc/personal_acc.html" class="nav-btn">Личный кабинет</a>
     </div>
 
-    <!-- Main Content -->
+    <!-- Основной контент -->
     <div class="container">
-        <h1>Добавление объявления</h1>
-        <form id="listing-form">
-            <!-- Изображение -->
+        <h1>Добавить объявление</h1>
+        <form id="listing-form" novalidate>
+            <!-- Блок загрузки изображения -->
             <div class="image-upload">
-                <img src="placeholder-image.jpg" alt="Изображение 4х4">
+                <img src="https://via.placeholder.com/200x200/cccccc/666666?text=Загрузить+фото" alt="Изображение 4х4" id="preview-image">
                 <label for="image-upload">Вставить из</label>
-                <input type="file" id="image-upload" style="display: none;">
+                <input type="file" id="image-upload" accept="image/*" style="display: none;">
             </div>
 
             <!-- Форма -->
             <div class="form-group">
-                <label for="type">Тип помещения</label>
-                <select id="type">
+                <label for="type">Тип помещения <span style="color: red;">*</span></label>
+                <select id="type" name="type" required>
+                    <option value="">Выберите тип</option>
                     <option value="storage">Кладовка</option>
                     <option value="office">Офис</option>
-                    <option value="retail">Торговое помещение</option>
+                    <option value="warehouse">Склад</option>
                 </select>
             </div>
 
             <div class="form-group">
-                <label for="city">Город</label>
-                <input type="text" id="city" placeholder="Введите город">
+                <label for="city">Город <span style="color: red;">*</span></label>
+                <input type="text" id="city" name="city" placeholder="Например: Уфа" required>
             </div>
 
             <div class="form-group">
-                <label for="address">Адрес</label>
-                <input type="text" id="address" placeholder="Введите адрес">
+                <label for="address">Адрес <span style="color: red;">*</span></label>
+                <input type="text" id="address" name="address" placeholder="Улица, дом" required>
             </div>
 
             <div class="form-group">
-                <label for="price">Цена</label>
-                <input type="number" id="price" placeholder="Введите цену">
+                <label for="price">Цена в месяц <span style="color: red;">*</span></label>
+                <input type="number" id="price" name="price" placeholder="10000" min="1" required>
             </div>
 
             <div class="form-group">
-                <label for="description">Описание</label>
-                <textarea id="description" rows="5" placeholder="Введите описание"></textarea>
+                <label for="description">Описание <span style="color: red;">*</span></label>
+                <textarea id="description" name="description" rows="5" placeholder="Опишите помещение, площадь, условия..." minlength="10" required></textarea>
             </div>
 
             <div class="form-group">
-                <label for="comment">Комментарий</label>
-                <textarea id="comment" rows="3" placeholder="Введите комментарий"></textarea>
+                <label for="comment">Комментарий (необязательно)</label>
+                <textarea id="comment" name="comment" rows="3" placeholder="Дополнительная информация"></textarea>
             </div>
 
             <button type="submit">Добавить объявление</button>
         </form>
     </div>
 
-    <!-- Footer -->
+    <!-- Футер -->
     <footer>
-        <p>© 2025. Все права защищены<br>Политика конфиденциальности</p>
+        <p>© 2025. Все права защищены<br>
+        <a href="/privacy">Политика конфиденциальности</a></p>
     </footer>
+
+    <!-- Подключаем JS -->
     <script src="add-listing.js"></script>
 </body>
 </html>

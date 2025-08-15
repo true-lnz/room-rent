@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -107,13 +109,46 @@ func AddListingHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	path := "../frontend/add_listing/add-listing.html"
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		log.Println("Файл НЕ НАЙДЕН:", path)
-		http.Error(w, "Файл не найден", http.StatusNotFound)
+	// Если запрос к корню /add-listing, показываем HTML
+	if r.URL.Path == "/add-listing" {
+		path := "../frontend/add_listing/add-listing.html"
+		if _, err := os.Stat(path); os.IsNotExist(err) {
+			log.Println("Файл НЕ НАЙДЕН:", path)
+			http.Error(w, "Файл не найден", http.StatusNotFound)
+			return
+		}
+		log.Println("Файл найден:", path)
+		http.ServeFile(w, r, path)
 		return
 	}
 
-	log.Println("Файл найден:", path)
-	http.ServeFile(w, r, path)
+	// Для статических файлов (CSS, JS, изображения) раздаём из папки add_listing
+	// Убираем /add-listing из пути и добавляем ../frontend/add_listing
+	staticPath := "../frontend/add_listing" + strings.TrimPrefix(r.URL.Path, "/add-listing")
+
+	// Проверяем существование файла
+	if _, err := os.Stat(staticPath); os.IsNotExist(err) {
+		log.Println("Статический файл НЕ НАЙДЕН:", staticPath)
+		http.NotFound(w, r)
+		return
+	}
+
+	// Определяем MIME-тип по расширению файла
+	ext := filepath.Ext(staticPath)
+	switch ext {
+	case ".css":
+		w.Header().Set("Content-Type", "text/css")
+	case ".js":
+		w.Header().Set("Content-Type", "application/javascript")
+	case ".jpg", ".jpeg":
+		w.Header().Set("Content-Type", "image/jpeg")
+	case ".png":
+		w.Header().Set("Content-Type", "image/png")
+	case ".gif":
+		w.Header().Set("Content-Type", "image/gif")
+	default:
+		w.Header().Set("Content-Type", "text/plain")
+	}
+
+	http.ServeFile(w, r, staticPath)
 }
