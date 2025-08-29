@@ -3,12 +3,14 @@ package models
 import (
 	"database/sql"
 	"errors"
+	"fmt"
 )
 
 type User struct {
 	ID       int
 	Email    string `json:"email"`
 	Password string `json:"password"`
+	RoleName string `json:"role"`
 	RoleID   int    `json:"role_id"`
 }
 
@@ -23,6 +25,7 @@ func (m *UserModel) Insert(email, hashedPassword string, roleID int) error {
 		VALUES ($1, $2, $3)`,
 		email, hashedPassword, roleID,
 	)
+	fmt.Println(email, hashedPassword, roleID)
 
 	return err
 }

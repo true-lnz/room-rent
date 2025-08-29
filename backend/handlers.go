@@ -27,16 +27,19 @@ func (app *application) Register() fiber.Handler {
 		if user != nil && !errors.Is(err, models.ErrNoRecord) {
 			return fiber.NewError(fiber.StatusConflict, "Пользователь с таким Email уже зарегистрирован")
 		}
-		if err != nil {
-			return fiber.NewError(fiber.StatusInternalServerError, "Внутренняя ошибка сервера")
-		}
+
+		role, err := app.roles.FindByName(u.RoleName)
+
+		//if err == nil {
+		//	return fiber.NewError(fiber.StatusInternalServerError, "Внутренняя ошибка сервера")
+		//}
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка хэширования пароля")
 		}
 
-		err = app.users.Insert(u.Email, string(hashedPassword), u.RoleID)
+		err = app.users.Insert(u.Email, string(hashedPassword), role)
 		if err != nil {
 			return fiber.NewError(fiber.StatusConflict, "Ошибка регистрации")
 		}
@@ -53,7 +56,7 @@ func (app *application) Login() fiber.Handler {
 		}
 
 		var storedPassword string
-		err := app.listings.DB.QueryRow("SELECT verification_code FROM users WHERE email = $1", creds.Email).Scan(&storedPassword)
+		err := app.listings.DB.QueryRow("SELECT password FROM users WHERE email = $1", creds.Email).Scan(&storedPassword)
 		if err != nil || bcrypt.CompareHashAndPassword([]byte(storedPassword), []byte(creds.Password)) != nil {
 			return fiber.NewError(fiber.StatusUnauthorized, "Неверный логин или пароль")
 		}
