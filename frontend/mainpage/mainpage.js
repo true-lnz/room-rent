@@ -7,7 +7,7 @@ const listingsData = [
             city: "ufa",
             address: "ул. Космонавтов 1",
             description: "Сдаётся кладовка на 1 этаже",
-            image: "images/image.jpg",
+            image: "/frontend/public/image1.jpg",
             date: "2025-07-22"
         },
         {
@@ -18,7 +18,7 @@ const listingsData = [
             city: "ufa",
             address: "ул. Ленина 42",
             description: "Сдаётся офисное помещение",
-            image: "images/image.jpg",
+            image: "/frontend/public/image1.jpg",
             date: "2025-07-20"
         },
         {
@@ -29,7 +29,7 @@ const listingsData = [
             city: "moscow",
             address: "ул. Гагарина 15",
             description: "Сдаётся складское помещение",
-            image: "images/image.jpg",
+            image: "/frontend/public/image1.jpg",
             date: "2025-07-15"
         }
     ];

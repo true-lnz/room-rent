@@ -2,10 +2,10 @@ package main
 
 import (
 	"backend/internal/models"
+	"log"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
-	"log"
-	"net/http"
 )
 
 type application struct {
@@ -39,20 +39,60 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	appFiber.Static("/", "./frontend/public")
+	// Static assets (пути относительно папки backend)
+	appFiber.Static("/public", "../frontend/public")
+	appFiber.Static("/assets", "../frontend")
+	appFiber.Static("/frontend", "../frontend")
+	// Корень сайта отдаёт главную страницу и её статику
+	appFiber.Static("/", "../frontend/mainpage", fiber.Static{Index: "mainpage.html"})
 
 	apiGroup := appFiber.Group("/api")
 	apiGroup.Post("/register", app.Register())
 	apiGroup.Post("/login", app.Login())
+	apiGroup.Post("/add-listing", app.SaveListingPost)
 
-	http.HandleFunc("/api/add-listing", app.SaveListingPost)
+	// Page routes
+	appFiber.Get("/main", func(c *fiber.Ctx) error {
+		return c.Redirect("/", fiber.StatusFound)
+	})
 
-	// Подключаем директорию frontend
-	http.Handle("/frontend/", http.StripPrefix("/frontend/", http.FileServer(http.Dir("../frontend"))))
+	// Статические файлы главной страницы по корню
+	appFiber.Get("/mainpage.css", func(c *fiber.Ctx) error {
+		return c.SendFile("../frontend/mainpage/mainpage.css")
+	})
+	appFiber.Get("/mainpage.js", func(c *fiber.Ctx) error {
+		return c.SendFile("../frontend/mainpage/mainpage.js")
+	})
+	appFiber.Get("/authorization", func(c *fiber.Ctx) error {
+		return c.Redirect("/frontend/authorization/authorization.html", fiber.StatusFound)
+	})
+	appFiber.Get("/add", func(c *fiber.Ctx) error {
+		return c.Redirect("/frontend/add_listing/add-listing.html", fiber.StatusFound)
+	})
+	appFiber.Get("/personal", func(c *fiber.Ctx) error {
+		return c.Redirect("/frontend/personal_acc/personal_acc.html", fiber.StatusFound)
+	})
+	appFiber.Get("/my-listings", func(c *fiber.Ctx) error {
+		return c.Redirect("/frontend/personal_acc/my_listings.html", fiber.StatusFound)
+	})
 
-	// Защищённые маршруты для добавления объявления
-	http.HandleFunc("/add", AddListingHandler)
+	// Прямые ссылки на файлы внутри /frontend (для существующей логики фронта)
+	appFiber.Get("/frontend/mainpage/mainpage.html", func(c *fiber.Ctx) error {
+		return c.SendFile("../frontend/mainpage/mainpage.html")
+	})
+	appFiber.Get("/frontend/authorization/authorization.html", func(c *fiber.Ctx) error {
+		return c.SendFile("../frontend/authorization/authorization.html")
+	})
+	appFiber.Get("/frontend/add_listing/add-listing.html", func(c *fiber.Ctx) error {
+		return c.SendFile("../frontend/add_listing/add-listing.html")
+	})
+	appFiber.Get("/frontend/personal_acc/personal_acc.html", func(c *fiber.Ctx) error {
+		return c.SendFile("../frontend/personal_acc/personal_acc.html")
+	})
+	appFiber.Get("/frontend/personal_acc/my_listings.html", func(c *fiber.Ctx) error {
+		return c.SendFile("../frontend/personal_acc/my_listings.html")
+	})
 
 	log.Println("Сервер запущен на http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	log.Fatal(appFiber.Listen(":8080"))
 }
