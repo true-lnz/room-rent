@@ -2,17 +2,17 @@ package main
 
 import (
 	"backend/internal/models"
-	"encoding/json"
 	"errors"
-	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var jwtKey = []byte("my_secret_key") // Лучше потом спрятать в .env
@@ -143,37 +143,24 @@ type ListingRequest struct {
 	UserEmail string `json:"user_email"`
 }
 
-func (app *application) SaveListingPost(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Метод не поддерживается", http.StatusMethodNotAllowed)
-		return
-	}
-
+func (app *application) SaveListingPost(c *fiber.Ctx) error {
 	// Проверяем авторизацию
-	cookie, err := r.Cookie("session_token")
-	if err != nil || cookie.Value == "" {
-		http.Error(w, "Не авторизован", http.StatusUnauthorized)
-		return
+	token := c.Cookies("session_token")
+	if token == "" {
+		return fiber.NewError(fiber.StatusUnauthorized, "Не авторизован")
 	}
 
 	// Читаем JSON
 	var listingReq ListingRequest
-	err = json.NewDecoder(r.Body).Decode(&listingReq)
-	if err != nil {
-		http.Error(w, "Ошибка парсинга данных", http.StatusBadRequest)
-		return
+	if err := c.BodyParser(&listingReq); err != nil {
+		return fiber.NewError(fiber.StatusBadRequest, "Ошибка парсинга данных")
 	}
 
 	// Получаем user_id по email
 	user, err := app.users.FindByEmail(listingReq.UserEmail)
 	if err != nil {
 		log.Println("Ошибка получения user_id:", err)
-		http.Error(w, "Пользователь не найден", http.StatusNotFound)
-	}
-	if err != nil {
-		log.Println("Ошибка получения user_id:", err)
-		http.Error(w, "Пользователь не найден", http.StatusNotFound)
-		return
+		return fiber.NewError(fiber.StatusNotFound, "Пользователь не найден")
 	}
 
 	// Создаём объект для сохранения
@@ -187,13 +174,10 @@ func (app *application) SaveListingPost(w http.ResponseWriter, r *http.Request) 
 	}
 
 	// Сохраняем в БД
-	err = app.listings.Save(listing)
-	if err != nil {
-		http.Error(w, "Ошибка сохранения в БД", http.StatusInternalServerError)
+	if err := app.listings.Save(listing); err != nil {
 		log.Println("Ошибка БД:", err)
-		return
+		return fiber.NewError(fiber.StatusInternalServerError, "Ошибка сохранения в БД")
 	}
 
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Объявление успешно добавлено!"))
+	return c.SendString("Объявление успешно добавлено!")
 }
