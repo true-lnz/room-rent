@@ -11,6 +11,7 @@ import (
 type application struct {
 	listings *models.ListingModel
 	users    *models.UserModel
+	roles    *models.RoleModel
 }
 
 func main() {
@@ -19,6 +20,7 @@ func main() {
 	app := application{
 		listings: &models.ListingModel{DB: db},
 		users:    &models.UserModel{DB: db},
+		roles:    &models.RoleModel{DB: db},
 	}
 
 	appFiber := fiber.New(fiber.Config{
