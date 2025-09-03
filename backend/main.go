@@ -12,15 +12,22 @@ type application struct {
 	listings *models.ListingModel
 	users    *models.UserModel
 	roles    *models.RoleModel
+	jwtKey   []byte
 }
 
 func main() {
+	// Загружаем переменные окружения из .env файла
+	loadEnv()
+
 	// Подключение к базе данных
 	db := Connect()
+	// Читаем JWT секретный ключ из переменных окружения
+	jwtSecret := getEnv("JWT_SECRET", "change_me_please_and_keep_it_long")
 	app := application{
 		listings: &models.ListingModel{DB: db},
 		users:    &models.UserModel{DB: db},
 		roles:    &models.RoleModel{DB: db},
+		jwtKey:   []byte(jwtSecret),
 	}
 
 	appFiber := fiber.New(fiber.Config{
@@ -95,6 +102,9 @@ func main() {
 		return c.SendFile("../frontend/personal_acc/my_listings.html")
 	})
 
-	log.Println("Сервер запущен на http://localhost:8080")
-	log.Fatal(appFiber.Listen(":8080"))
+	// Получаем порт из переменных окружения
+	port := getEnv("PORT", "8080")
+
+	log.Printf("Сервер запущен на http://localhost:%s", port)
+	log.Fatal(appFiber.Listen(":" + port))
 }

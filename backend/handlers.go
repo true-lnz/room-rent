@@ -15,7 +15,7 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtKey = []byte("my_secret_key") // Лучше потом спрятать в .env
+// jwtKey теперь хранится в приложении и читается из .env (см. main.go)
 
 func (app *application) Register() fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -67,7 +67,7 @@ func (app *application) Login() fiber.Handler {
 			"exp":   time.Now().Add(24 * time.Hour).Unix(),
 		})
 
-		tokenString, err := token.SignedString(jwtKey)
+		tokenString, err := token.SignedString(app.jwtKey)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка создания токена")
 		}

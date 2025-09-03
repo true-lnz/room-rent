@@ -4,6 +4,7 @@ go 1.24.5
 
 require (
 	github.com/golang-jwt/jwt/v5 v5.3.0
+	github.com/joho/godotenv v1.5.1
 	github.com/lib/pq v1.10.9
 	golang.org/x/crypto v0.41.0
 )
@@ -19,6 +20,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/valyala/fasthttp v1.65.0 // indirect
-	github.com/valyala/tcplisten v1.0.0 // indirect
 	golang.org/x/sys v0.35.0 // indirect
 )
