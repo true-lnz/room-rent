@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"time"
 
@@ -76,13 +77,217 @@ func (app *application) Login() fiber.Handler {
 			Name:     "session_token",
 			Value:    tokenString,
 			Path:     "/",
-			HTTPOnly: true,     // Можно false, если хочешь видеть в JS
-			SameSite: "Strict", // защищает от CSRF, но не блокирует переходы
+			HTTPOnly: true,
+			SameSite: "Strict",
 			Expires:  time.Now().Add(24 * time.Hour),
 		})
 
-		//todo убрать токен
 		return c.JSON(fiber.Map{"token": tokenString})
+	}
+}
+
+// GetListings возвращает последние объявления
+func (app *application) GetListings() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		listings, err := app.listings.ListLatest(50)
+		if err != nil {
+			log.Println("Ошибка получения объявлений:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка получения объявлений")
+		}
+		return c.JSON(listings)
+	}
+}
+
+// GetAvailableListings возвращает объявления, свободные в диапазоне дат [from,to]
+func (app *application) GetAvailableListings() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		from := c.Query("from")
+		to := c.Query("to")
+		if from == "" || to == "" {
+			return fiber.NewError(fiber.StatusBadRequest, "Параметры from и to обязательны")
+		}
+		// Валидация дат
+		if _, err := time.Parse("2006-01-02", from); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат даты from")
+		}
+		if _, err := time.Parse("2006-01-02", to); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат даты to")
+		}
+		rows, err := app.listings.DB.Query(`
+			SELECT b.building_id, b.name, b.city, b.address, b.cost_per_day::text, b.comment, b.user_id
+			FROM buildings b
+			WHERE NOT EXISTS (
+				SELECT 1 FROM rent r
+				WHERE r.building_id = b.building_id
+				  AND NOT ($2 < r.start_date OR $1 > r.end_date)
+			)
+			ORDER BY b.building_id DESC
+		`, from, to)
+		if err != nil {
+			log.Println("Ошибка получения доступных объявлений:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка получения объявлений")
+		}
+		defer rows.Close()
+		type L struct {
+			ID      int    `json:"id"`
+			Type    string `json:"type"`
+			City    string `json:"city"`
+			Address string `json:"address"`
+			Price   string `json:"price"`
+			Comment string `json:"comment"`
+			UserID  int    `json:"user_id"`
+		}
+		var list []L
+		for rows.Next() {
+			var l L
+			if err := rows.Scan(&l.ID, &l.Type, &l.City, &l.Address, &l.Price, &l.Comment, &l.UserID); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
+			}
+			list = append(list, l)
+		}
+		if err := rows.Err(); err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
+		}
+		return c.JSON(list)
+	}
+}
+
+// GetMyListings возвращает объявления текущего пользователя (по email)
+func (app *application) GetMyListings() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		email := c.Query("email")
+		if email == "" {
+			return fiber.NewError(fiber.StatusBadRequest, "email обязателен")
+		}
+		user, err := app.users.FindByEmail(email)
+		if err != nil {
+			return fiber.NewError(fiber.StatusNotFound, "Пользователь не найден")
+		}
+		listings, err := app.listings.ListByUserID(user.ID)
+		if err != nil {
+			log.Println("Ошибка получения моих объявлений:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка получения объявлений")
+		}
+		return c.JSON(listings)
+	}
+}
+
+// GetMyBookings возвращает бронирования пользователя с краткой инфой по помещению
+func (app *application) GetMyBookings() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		email := c.Query("email")
+		if email == "" {
+			return fiber.NewError(fiber.StatusBadRequest, "email обязателен")
+		}
+		user, err := app.users.FindByEmail(email)
+		if err != nil {
+			return fiber.NewError(fiber.StatusNotFound, "Пользователь не найден")
+		}
+		rows, err := app.listings.DB.Query(`
+			SELECT r.rent_id, r.start_date, r.end_date, r.total_amount::text,
+			       b.building_id, b.name, b.city, b.address
+			FROM rent r
+			JOIN buildings b ON b.building_id = r.building_id
+			WHERE r.user_id = $1
+			ORDER BY r.rent_id DESC
+		`, user.ID)
+		if err != nil {
+			log.Println("Ошибка получения бронирований:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка получения бронирований")
+		}
+		defer rows.Close()
+
+		type Booking struct {
+			ID          int    `json:"id"`
+			StartDate   string `json:"start_date"`
+			EndDate     string `json:"end_date"`
+			TotalAmount string `json:"total_amount"`
+			BuildingID  int    `json:"building_id"`
+			Type        string `json:"type"`
+			City        string `json:"city"`
+			Address     string `json:"address"`
+		}
+		var list []Booking
+		for rows.Next() {
+			var b Booking
+			if err := rows.Scan(&b.ID, &b.StartDate, &b.EndDate, &b.TotalAmount, &b.BuildingID, &b.Type, &b.City, &b.Address); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
+			}
+			list = append(list, b)
+		}
+		if err := rows.Err(); err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
+		}
+		return c.JSON(list)
+	}
+}
+
+// CreateBooking создаёт бронирование
+func (app *application) CreateBooking() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		var req struct {
+			BuildingID int    `json:"building_id"`
+			StartDate  string `json:"start_date"`
+			EndDate    string `json:"end_date"`
+			Email      string `json:"email"`
+		}
+		if err := c.BodyParser(&req); err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат данных")
+		}
+		if req.BuildingID == 0 || req.StartDate == "" || req.EndDate == "" || req.Email == "" {
+			return fiber.NewError(fiber.StatusBadRequest, "Не все поля заполнены")
+		}
+		user, err := app.users.FindByEmail(req.Email)
+		if err != nil {
+			return fiber.NewError(fiber.StatusNotFound, "Пользователь не найден")
+		}
+		// Проверка пересечения дат для выбранного помещения
+		{
+			var exists bool
+			err := app.listings.DB.QueryRow(`
+				SELECT EXISTS (
+					SELECT 1 FROM rent
+					WHERE building_id = $1
+					  AND NOT ($3 < start_date OR $2 > end_date)
+				)
+			`, req.BuildingID, req.StartDate, req.EndDate).Scan(&exists)
+			if err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "Ошибка проверки доступности")
+			}
+			if exists {
+				return fiber.NewError(fiber.StatusConflict, "На выбранные даты помещение уже занято")
+			}
+		}
+		// Получим цену помещения (за месяц)
+		var priceText string
+		if err := app.listings.DB.QueryRow("SELECT cost_per_day::text FROM buildings WHERE building_id=$1", req.BuildingID).Scan(&priceText); err != nil {
+			return fiber.NewError(fiber.StatusNotFound, "Объявление не найдено")
+		}
+		price, _ := strconv.Atoi(priceText)
+		start, err := time.Parse("2006-01-02", req.StartDate)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Неверная дата начала")
+		}
+		end, err := time.Parse("2006-01-02", req.EndDate)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Неверная дата окончания")
+		}
+		if !end.After(start) {
+			return fiber.NewError(fiber.StatusBadRequest, "Дата окончания должна быть позже даты начала")
+		}
+		// Округляем количество месяцев вверх, считая 30 дней в месяце
+		days := int(end.Sub(start).Hours() / 24)
+		months := (days + 29) / 30
+		if months < 1 {
+			months = 1
+		}
+		total := price * months
+		_, err = app.listings.DB.Exec(`INSERT INTO rent (start_date, end_date, total_amount, user_id, building_id) VALUES ($1,$2,$3,$4,$5)`, req.StartDate, req.EndDate, total, user.ID, req.BuildingID)
+		if err != nil {
+			log.Println("Ошибка сохранения бронирования:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка сохранения бронирования")
+		}
+		return c.JSON(fiber.Map{"message": "Бронирование создано", "total_amount": total, "months": months})
 	}
 }
 

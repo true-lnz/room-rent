@@ -1,40 +1,6 @@
-const listingsData = [
-        {
-            id: 1,
-            title: "Помещение 10 м² 1 этаж",
-            price: 10000,
-            type: "storage",
-            city: "ufa",
-            address: "ул. Космонавтов 1",
-            description: "Сдаётся кладовка на 1 этаже",
-            image: "/frontend/public/image1.jpg",
-            date: "2025-07-22"
-        },
-        {
-            id: 2,
-            title: "Помещение 15 м² 2 этаж",
-            price: 15000,
-            type: "office",
-            city: "ufa",
-            address: "ул. Ленина 42",
-            description: "Сдаётся офисное помещение",
-            image: "/frontend/public/image1.jpg",
-            date: "2025-07-20"
-        },
-        {
-            id: 3,
-            title: "Помещение 25 м² цоколь",
-            price: 8000,
-            type: "storage",
-            city: "moscow",
-            address: "ул. Гагарина 15",
-            description: "Сдаётся складское помещение",
-            image: "/frontend/public/image1.jpg",
-            date: "2025-07-15"
-        }
-    ];
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const token = localStorage.getItem("token");
+    let userEmail = '';
 
     if (!token) {
         alert("Вы не авторизованы");
@@ -44,12 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
-        const email = payload.email;
+        userEmail = payload.email;
 
         const userNav = document.querySelector(".user-nav");
         if (userNav) {
             const emailTag = document.createElement("div");
-            emailTag.textContent = `Вы вошли как: ${email}`;
+            emailTag.textContent = `Вы вошли как: ${userEmail}`;
             emailTag.style.marginLeft = "auto";
             emailTag.style.fontWeight = "bold";
             userNav.appendChild(emailTag);
@@ -69,13 +35,63 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
+    // Загружаем объявления с сервера
+    let listingsData = [];
+    try {
+        const res = await fetch('/api/listings');
+        if (res.ok) {
+            listingsData = await res.json();
+        } else {
+            console.warn('Не удалось загрузить объявления:', await res.text());
+        }
+    } catch (e) {
+        console.error('Ошибка загрузки объявлений', e);
+    }
+
+    // Справочники отображения
+    const getTypeName = (code) => ({
+        storage: 'Кладовка',
+        office: 'Офис',
+        retail: 'Торговое помещение'
+    }[code] || code);
+
+    const getCityName = (codeOrRu) => {
+        const map = { ufa: 'Уфа', moscow: 'Москва', spb: 'Санкт-Петербург' };
+        if (map[codeOrRu]) return map[codeOrRu];
+        return codeOrRu;
+    };
+
+    const normalizeCityCode = (val) => {
+        const v = (val || '').toString().toLowerCase();
+        if (v === 'уфа') return 'ufa';
+        if (v === 'москва') return 'moscow';
+        if (v.includes('петербург') || v === 'спб') return 'spb';
+        return v;
+    };
+
     // Инициализация
     renderListings(listingsData);
     document.querySelector('.close-btn').addEventListener('click', () => {
-    document.getElementById('modal').style.display = 'none';
+        document.getElementById('modal').style.display = 'none';
     });
 
-    // Закрытие по клику вне окна
+    // Тоггл фильтров
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const filter = this.closest('.filter');
+            const isActive = filter.classList.contains('active');
+            document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
+            if (!isActive) filter.classList.add('active');
+        });
+    });
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.filter') && !e.target.classList.contains('filter-btn')) {
+            document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
+        }
+    });
+
+    // Закрытие по клику вне модалки
     window.addEventListener('click', (e) => {
         const modal = document.getElementById('modal');
         if (e.target === modal) {
@@ -83,123 +99,161 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Текущее объявление для бронирования
+    let currentListingId = null;
+
     // Форма бронирования
-    document.querySelector('.booking-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        alert('Спасибо! Ваша заявка на бронирование отправлена.');
-        document.getElementById('modal').style.display = 'none';
-    });
-    // Обработчики фильтров
-    document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            const filter = this.closest('.filter');
-            const isActive = filter.classList.contains('active');
-            
-            document.querySelectorAll('.filter').forEach(f => {
-                f.classList.remove('active');
-            });
-            
-            if (!isActive) {
-                filter.classList.add('active');
+    const bookingForm = document.querySelector('.booking-form');
+    if (bookingForm) {
+        bookingForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const start = document.getElementById('start-date').value;
+            const end = document.getElementById('end-date').value;
+            if (!currentListingId || !start || !end) {
+                alert('Укажите даты');
+                return;
+            }
+            try {
+                const resp = await fetch('/api/rent', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        building_id: currentListingId,
+                        start_date: start,
+                        end_date: end,
+                        email: userEmail
+                    })
+                });
+                if (resp.ok) {
+                    const data = await resp.json();
+                    alert('Бронирование создано. Сумма: ' + (data.total_amount || 0));
+                    document.getElementById('modal').style.display = 'none';
+                } else {
+                    const txt = await resp.text();
+                    alert('Ошибка бронирования: ' + txt);
+                }
+            } catch (err) {
+                console.error('Ошибка бронирования', err);
+                alert('Ошибка сети');
             }
         });
-    });
-    
-    // Закрытие при клике вне фильтра
-    document.addEventListener('click', function(e) {
-        if (!e.target.closest('.filter') && !e.target.classList.contains('filter-btn')) {
-            document.querySelectorAll('.filter').forEach(f => {
-                f.classList.remove('active');
-            });
-        }
-    });
+    }
 
-    // Обработчик кнопки сброса фильтров
+    async function applyFilters() {
+        const priceMin = parseInt(document.getElementById('price-min').value) || 0;
+        const priceMax = parseInt(document.getElementById('price-max').value) || 999999;
+        const type = document.getElementById('type').value; // code or ''
+        const city = document.getElementById('city').value; // code or ''
+        const dateFrom = document.getElementById('date-from')?.value || '';
+        const dateTo = document.getElementById('date-to')?.value || '';
+
+        let filtered = listingsData.filter(listing => {
+            const priceNum = parseInt(listing.price) || 0;
+            const priceOk = priceNum >= priceMin && priceNum <= priceMax;
+            const typeOk = !type || listing.type === type;
+            const cityOk = !city || normalizeCityCode(listing.city) === city;
+            let dateOk = true;
+            if (dateFrom) dateOk = dateOk && (listing.date ? listing.date >= dateFrom : true);
+            if (dateTo) dateOk = dateOk && (listing.date ? listing.date <= dateTo : true);
+            return priceOk && typeOk && cityOk && dateOk;
+        });
+
+        if (dateFrom && dateTo) {
+            try {
+                const res = await fetch(`/api/listings/available?from=${dateFrom}&to=${dateTo}`);
+                if (res.ok) {
+                    const availableListings = await res.json();
+                    filtered = availableListings.filter(listing => {
+                        const priceNum = parseInt(listing.price) || 0;
+                        const priceOk = priceNum >= priceMin && priceNum <= priceMax;
+                        const typeOk = !type || listing.type === type;
+                        const cityOk = !city || normalizeCityCode(listing.city) === city;
+                        return priceOk && typeOk && cityOk;
+                    });
+                } else {
+                    console.warn('Не удалось загрузить доступные объявления по датам:', await res.text());
+                }
+            } catch (e) {
+                console.error('Ошибка загрузки доступных объявлений по датам', e);
+            }
+        }
+
+        renderListings(filtered);
+        document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
+    }
+    window.applyFilters = applyFilters;
+
     document.getElementById('reset-filters').addEventListener('click', function() {
-        // Сброс значений фильтров
         document.getElementById('price-min').value = '';
         document.getElementById('price-max').value = '';
         document.getElementById('type').value = '';
         document.getElementById('city').value = '';
         document.getElementById('date-from').value = '';
         document.getElementById('date-to').value = '';
-        
-        // Применение фильтров (покажет все объявления)
-        applyFilters();
+        renderListings(listingsData);
     });
-});
-// Функция для отображения названия города вместо кода
-function getCityName(cityCode) {
-    const cities = {
-        ufa: 'Уфа',
-        moscow: 'Москва',
-        spb: 'Санкт-Петербург'
-    };
-    return cities[cityCode] || cityCode;
-}
-// Функция фильтрации
-function applyFilters() {
-    const priceMin = parseInt(document.getElementById('price-min').value) || 0;
-    const priceMax = parseInt(document.getElementById('price-max').value) || 999999;
-    const type = document.getElementById('type').value;
-    const city = document.getElementById('city').value;
-    const dateFrom = document.getElementById('date-from').value;
-    const dateTo = document.getElementById('date-to').value;
-    
-    const filtered = listingsData.filter(listing => {
-        const priceOk = listing.price >= priceMin && listing.price <= priceMax;
-        const typeOk = !type || listing.type === type;
-        const cityOk = !city || listing.city === city;
-        const dateOk = (!dateFrom || listing.date >= dateFrom) && 
-                      (!dateTo || listing.date <= dateTo);
-        
-        return priceOk && typeOk && cityOk && dateOk;
-    });
-    
-    renderListings(filtered);
-}
 
-function renderListings(listings) {
-    const container = document.getElementById('listings-container');
-    if (listings.length === 0) {
-        container.innerHTML = '<div class="no-results">Ничего не найдено. Измените параметры фильтрации.</div>';
-        return;
+    function openModalFor(listing) {
+        if (!listing) return;
+        currentListingId = listing.id;
+        const title = `${getTypeName(listing.type)} — ${getCityName(listing.city)}`;
+        const priceNum = parseInt(listing.price) || 0;
+        const img = '/frontend/public/image1.jpg';
+        const modal = document.getElementById('modal');
+        const titleEl = document.querySelector('.modal-title');
+        const priceEl = document.querySelector('.modal-price');
+        const descrEl = document.querySelector('.modal-description');
+        const cityEl = document.querySelector('.modal-city');
+        const addrEl = document.querySelector('.modal-address');
+        const imgEl = document.querySelector('.modal-image');
+        if (titleEl) titleEl.textContent = title;
+        if (priceEl) priceEl.textContent = `${priceNum.toLocaleString()} ₽/мес`;
+        if (descrEl) descrEl.textContent = listing.comment || '';
+        if (cityEl) cityEl.textContent = `Город: ${getCityName(listing.city)}`;
+        if (addrEl) addrEl.textContent = `Адрес: ${listing.address}`;
+        if (imgEl) imgEl.src = img;
+        if (modal) modal.style.display = 'flex';
     }
 
-    container.innerHTML = listings.map(listing => `
+    function renderListings(listings) {
+        const container = document.getElementById('listings-container');
+        if (!listings || listings.length === 0) {
+            container.innerHTML = '<div class="no-results">Ничего не найдено. Добавьте объявление или измените фильтры.</div>';
+            return;
+        }
+        container.innerHTML = listings.map(listing => {
+            const title = `${getTypeName(listing.type)} — ${getCityName(listing.city)}`;
+            const priceNum = parseInt(listing.price) || 0;
+            const img = '/frontend/public/image1.jpg';
+            return `
         <div class="listing">
-            <img src="${listing.image}" alt="Фото помещения" class="listing-image">
+            <img src="${img}" alt="Фото помещения" class="listing-image">
             <div class="listing-content">
-                <h3 class="listing-title">${listing.title}</h3>
-                <p class="listing-price">${listing.price.toLocaleString()} ₽/мес</p>
-                <p class="listing-description">${listing.description}</p>
+                <h3 class="listing-title">${title}</h3>
+                <p class="listing-price">${priceNum.toLocaleString()} ₽/мес</p>
+                <p class="listing-description">${listing.comment || ''}</p>
                 <p class="listing-address">${listing.address}</p>
                 <div class="listing-actions">
-                    <button class="btn btn-primary">Забронировать</button>
+                    <button class="btn btn-primary" data-id="${listing.id}">Забронировать</button>
                     <button class="btn btn-secondary" data-id="${listing.id}">Подробнее</button>
                 </div>
             </div>
-        </div>
-    `).join('');
+        </div>`;
+        }).join('');
 
-    // Добавляем обработчики для кнопок "Подробнее"
-    document.querySelectorAll('.btn-secondary[data-id]').forEach(btn => {
-        btn.addEventListener('click', function () {
-            const id = parseInt(this.getAttribute('data-id'));
-            const listing = listingsData.find(item => item.id === id);
-
-            if (listing) {
-                document.querySelector('.modal-title').textContent = listing.title;
-                document.querySelector('.modal-price').textContent = `${listing.price.toLocaleString()} ₽/мес`;
-                document.querySelector('.modal-description').textContent = listing.description;
-                document.querySelector('.modal-city').textContent = `Город: ${getCityName(listing.city)}`;
-                document.querySelector('.modal-address').textContent = `Адрес: ${listing.address}`;
-                document.querySelector('.modal-image').src = listing.image;
-
-                // Показываем модальное окно
-                document.getElementById('modal').style.display = 'flex';
-            }
+        document.querySelectorAll('.btn-secondary[data-id]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = parseInt(this.getAttribute('data-id'));
+                const listing = listingsData.find(item => item.id === id);
+                openModalFor(listing);
+            });
         });
-    });
-}
+        document.querySelectorAll('.btn-primary[data-id]').forEach(btn => {
+            btn.addEventListener('click', function () {
+                const id = parseInt(this.getAttribute('data-id'));
+                const listing = listingsData.find(item => item.id === id);
+                openModalFor(listing);
+            });
+        });
+    }
+});

@@ -31,7 +31,8 @@ func (m *UserModel) Insert(email, hashedPassword string, roleID int) error {
 }
 
 func (m *UserModel) FindByEmail(email string) (*User, error) {
-	stmt := `SELECT * FROM users WHERE email = $1`
+	// Явно выбираем колонки в ожидаемом порядке
+	stmt := `SELECT user_id, email, password, role_id FROM users WHERE email = $1`
 	row := m.DB.QueryRow(stmt, email)
 
 	u := &User{}

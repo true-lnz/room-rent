@@ -59,6 +59,11 @@ func main() {
 	apiGroup.Post("/register", app.Register())
 	apiGroup.Post("/login", app.Login())
 	apiGroup.Post("/add-listing", app.SaveListingPost)
+	apiGroup.Post("/rent", app.CreateBooking())
+	apiGroup.Get("/listings", app.GetListings())
+	apiGroup.Get("/listings/available", app.GetAvailableListings())
+	apiGroup.Get("/my-listings", app.GetMyListings())
+	apiGroup.Get("/my-bookings", app.GetMyBookings())
 
 	// Page routes
 	appFiber.Get("/main", func(c *fiber.Ctx) error {
