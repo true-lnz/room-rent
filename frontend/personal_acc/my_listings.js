@@ -30,7 +30,7 @@ function renderListings(listings) {
         return;
     }
     container.innerHTML = listings.map(listing => {
-        const img = 'image1.jpg';
+        const img = imagesMap[listing.id] || 'image1.jpg';
         const priceNum = parseInt(listing.price) || 0;
         const title = `${listing.type} — ${listing.city}`;
         return `
@@ -53,6 +53,7 @@ function renderListings(listings) {
 // --- МОДАЛКИ И ПРОЧЕЕ ОСТАВЛЯЕМ БЕЗ ИЗМЕНЕНИЙ ---
 
 let listingsData = [];
+let imagesMap = {};
 
 function openEditModal(listing) {
     document.getElementById('edit-type').value = listing.type;
@@ -108,7 +109,7 @@ async function openViewModal(listing) {
     document.getElementById('modal-address').textContent = listing.address;
     document.getElementById('modal-price').textContent = (parseInt(listing.price)||0).toLocaleString();
     document.getElementById('modal-description').textContent = listing.comment || '';
-    document.getElementById('modal-image').src = 'image1.jpg';
+    document.getElementById('modal-image').src = imagesMap[listing.id] || 'image1.jpg';
     document.getElementById('view-modal').style.display = 'block';
     setupViewModalClose();
 }
@@ -126,6 +127,19 @@ function setupViewModalClose() {
 
 document.addEventListener('DOMContentLoaded', async () => {
     listingsData = await loadMyListings();
+    try {
+        await Promise.all((listingsData || []).map(async (l) => {
+            try {
+                const r = await fetch(`/api/listings/${l.id}/images`);
+                if (r.ok) {
+                    const imgs = await r.json();
+                    if (Array.isArray(imgs) && imgs.length > 0 && imgs[0].file_path) {
+                        imagesMap[l.id] = imgs[0].file_path;
+                    }
+                }
+            } catch (_) {}
+        }));
+    } catch (_) {}
     renderListings(listingsData);
 
     document.addEventListener('click', (e) => {

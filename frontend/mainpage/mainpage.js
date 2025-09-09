@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Загружаем объявления с сервера
     let listingsData = [];
+    let imagesMap = {};
     try {
         const res = await fetch('/api/listings');
         if (res.ok) {
@@ -47,6 +48,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (e) {
         console.error('Ошибка загрузки объявлений', e);
     }
+
+    // Загрузим первое изображение для каждого объявления
+    try {
+        await Promise.all((listingsData || []).map(async (l) => {
+            try {
+                const r = await fetch(`/api/listings/${l.id}/images`);
+                if (r.ok) {
+                    const imgs = await r.json();
+                    if (Array.isArray(imgs) && imgs.length > 0 && imgs[0].file_path) {
+                        imagesMap[l.id] = imgs[0].file_path;
+                    }
+                }
+            } catch (_) {}
+        }));
+    } catch (_) {}
 
     // Справочники отображения
     const getTypeName = (code) => ({
@@ -198,7 +214,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         currentListingId = listing.id;
         const title = `${getTypeName(listing.type)} — ${getCityName(listing.city)}`;
         const priceNum = parseInt(listing.price) || 0;
-        const img = '/frontend/public/image1.jpg';
+        const img = imagesMap[listing.id] || '/frontend/public/image1.jpg';
         const modal = document.getElementById('modal');
         const titleEl = document.querySelector('.modal-title');
         const priceEl = document.querySelector('.modal-price');
@@ -224,7 +240,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         container.innerHTML = listings.map(listing => {
             const title = `${getTypeName(listing.type)} — ${getCityName(listing.city)}`;
             const priceNum = parseInt(listing.price) || 0;
-            const img = '/frontend/public/image1.jpg';
+            const img = imagesMap[listing.id] || '/frontend/public/image1.jpg';
             return `
         <div class="listing">
             <img src="${img}" alt="Фото помещения" class="listing-image">

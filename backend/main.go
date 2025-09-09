@@ -52,6 +52,8 @@ func main() {
 	appFiber.Static("/public", "../frontend/public")
 	appFiber.Static("/assets", "../frontend")
 	appFiber.Static("/frontend", "../frontend")
+	// Папка с загруженными изображениями
+	appFiber.Static("/uploads", "../upload")
 	// Корень сайта отдаёт главную страницу и её статику
 	appFiber.Static("/", "../frontend/mainpage", fiber.Static{Index: "mainpage.html"})
 
@@ -59,6 +61,8 @@ func main() {
 	apiGroup.Post("/register", app.Register())
 	apiGroup.Post("/login", app.Login())
 	apiGroup.Post("/add-listing", app.SaveListingPost)
+	apiGroup.Post("/listings/:id/images", app.UploadListingImage())
+	apiGroup.Get("/listings/:id/images", app.GetListingImages())
 	apiGroup.Post("/rent", app.CreateBooking())
 	apiGroup.Get("/listings", app.GetListings())
 	apiGroup.Get("/listings/available", app.GetAvailableListings())

@@ -3,6 +3,7 @@ package main
 import (
 	"backend/internal/models"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -29,11 +30,7 @@ func (app *application) Register() fiber.Handler {
 			return fiber.NewError(fiber.StatusConflict, "Пользователь с таким Email уже зарегистрирован")
 		}
 
-		role, err := app.roles.FindByName(u.RoleName)
-
-		//if err == nil {
-		//	return fiber.NewError(fiber.StatusInternalServerError, "Внутренняя ошибка сервера")
-		//}
+		role, _ := app.roles.FindByName(u.RoleName)
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 		if err != nil {
@@ -381,11 +378,88 @@ func (app *application) SaveListingPost(c *fiber.Ctx) error {
 		UserID:  user.ID,
 	}
 
-	// Сохраняем в БД
-	if err := app.listings.Save(listing); err != nil {
+	// Сохраняем в БД и получаем ID
+	id, err := app.listings.Save(listing)
+	if err != nil {
 		log.Println("Ошибка БД:", err)
 		return fiber.NewError(fiber.StatusInternalServerError, "Ошибка сохранения в БД")
 	}
 
-	return c.SendString("Объявление успешно добавлено!")
+	return c.JSON(fiber.Map{"message": "Объявление успешно добавлено!", "id": id})
+}
+
+// UploadListingImage загружает изображение и сохраняет путь в БД
+func (app *application) UploadListingImage() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		listingIDStr := c.FormValue("listing_id")
+		if listingIDStr == "" {
+			listingIDStr = c.Params("id")
+		}
+		if listingIDStr == "" {
+			return fiber.NewError(fiber.StatusBadRequest, "Не указан идентификатор объявления")
+		}
+		listingID, err := strconv.Atoi(listingIDStr)
+		if err != nil || listingID <= 0 {
+			return fiber.NewError(fiber.StatusBadRequest, "Некорректный идентификатор объявления")
+		}
+
+		fileHeader, err := c.FormFile("image")
+		if err != nil {
+			log.Println("upload: form file error:", err)
+			return fiber.NewError(fiber.StatusBadRequest, "Файл image обязателен")
+		}
+
+		// Бизнес-правило: не более 10 МБ
+		const maxImageSize = 10 * 1024 * 1024
+		if fileHeader.Size > maxImageSize {
+			log.Println("upload: file too large:", fileHeader.Size)
+			return fiber.NewError(fiber.StatusRequestEntityTooLarge, "Размер файла превышает 10 МБ")
+		}
+		// Базовая проверка типа содержимого
+		contentType := fileHeader.Header.Get("Content-Type")
+		switch contentType {
+		case "image/jpeg", "image/jpg", "image/png", "image/webp", "image/gif":
+			// ok
+		default:
+			return fiber.NewError(fiber.StatusBadRequest, "Допустимы только изображения JPG, PNG, WEBP, GIF")
+		}
+
+		uploadDir := "../upload"
+		if _, err := os.Stat(uploadDir); os.IsNotExist(err) {
+			if err := os.MkdirAll(uploadDir, 0755); err != nil {
+				return fiber.NewError(fiber.StatusInternalServerError, "Не удалось создать папку загрузок")
+			}
+		}
+
+		ext := filepath.Ext(fileHeader.Filename)
+		fileName := fmt.Sprintf("listing_%d_%d%s", listingID, time.Now().UnixNano(), ext)
+		dstPath := filepath.Join(uploadDir, fileName)
+		if err := c.SaveFile(fileHeader, dstPath); err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Не удалось сохранить файл")
+		}
+
+		publicPath := "/uploads/" + fileName
+		imgID, err := app.listings.SaveImagePath(listingID, publicPath)
+		if err != nil {
+			log.Println("upload: db insert error:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Не удалось записать путь к изображению")
+		}
+		return c.JSON(fiber.Map{"url": publicPath, "image_id": imgID, "listing_id": listingID})
+	}
+}
+
+// GetListingImages возвращает список изображений объявления
+func (app *application) GetListingImages() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		idStr := c.Params("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil || id <= 0 {
+			return fiber.NewError(fiber.StatusBadRequest, "Некорректный id")
+		}
+		images, err := app.listings.ListImages(id)
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка получения изображений")
+		}
+		return c.JSON(images)
+	}
 }
