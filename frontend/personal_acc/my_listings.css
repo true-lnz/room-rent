@@ -160,6 +160,21 @@ footer p {
     margin: 20px 15px;
 }
 
+.btn-danger {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+}
+.btn-danger:hover {
+    background-color: #d32f2f;
+}
+.edit-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-start;
+    margin-top: 8px;
+}
+
 /* Модальное окно */
 .modal {
     display: none;
@@ -182,6 +197,8 @@ footer p {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     position: relative;
 }
+
+/* Компоновка модалки удаления, стили уже общие; дополнительные не требуются */
 
 .close {
     color: #aaa;

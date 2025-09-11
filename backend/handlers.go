@@ -463,3 +463,27 @@ func (app *application) GetListingImages() fiber.Handler {
 		return c.JSON(images)
 	}
 }
+
+// DeleteListing удаляет объявление и (каскадно) его изображения/бронирования при настроенных FK
+func (app *application) DeleteListing() fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		idStr := c.Params("id")
+		id, err := strconv.Atoi(idStr)
+		if err != nil || id <= 0 {
+			return fiber.NewError(fiber.StatusBadRequest, "Некорректный id")
+		}
+		// Простая защита: удаляем только если запись существует
+		var exists bool
+		if err := app.listings.DB.QueryRow("SELECT EXISTS (SELECT 1 FROM buildings WHERE building_id=$1)", id).Scan(&exists); err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка проверки объявления")
+		}
+		if !exists {
+			return fiber.NewError(fiber.StatusNotFound, "Объявление не найдено")
+		}
+		if _, err := app.listings.DB.Exec("DELETE FROM buildings WHERE building_id=$1", id); err != nil {
+			log.Println("Ошибка удаления объявления:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка удаления объявления")
+		}
+		return c.JSON(fiber.Map{"message": "Объявление удалено"})
+	}
+}

@@ -66,8 +66,24 @@
                     <textarea id="edit-description" rows="4" required placeholder="Опишите помещение, площадь, условия..."></textarea>
                 </div>
 
-                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                <div class="edit-actions">
+                    <button type="button" id="delete-listing" class="btn btn-danger">Удалить</button>
+                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+                </div>
             </form>
+        </div>
+    </div>
+    
+    <!-- Модальное окно подтверждения удаления -->
+    <div id="delete-modal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="delete-close">&times;</span>
+            <h2>Удаление объявления</h2>
+            <p>Вы действительно хотите удалить данное объявление? Это действие необратимо.</p>
+            <div class="edit-actions">
+                <button type="button" id="cancel-delete" class="btn btn-secondary">Отмена</button>
+                <button type="button" id="confirm-delete" class="btn btn-danger">Удалить</button>
+            </div>
         </div>
     </div>
 </body>

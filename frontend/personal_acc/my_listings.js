@@ -88,6 +88,43 @@ function setupEditForm() {
         closeEditModal();
         alert('Объявление успешно обновлено!');
     });
+
+    // Удаление объявления
+    const deleteBtn = document.getElementById('delete-listing');
+    const deleteModal = document.getElementById('delete-modal');
+    const deleteClose = document.getElementById('delete-close');
+    const cancelDelete = document.getElementById('cancel-delete');
+    const confirmDelete = document.getElementById('confirm-delete');
+
+    const openDeleteModal = () => { deleteModal.style.display = 'block'; };
+    const closeDeleteModal = () => { deleteModal.style.display = 'none'; };
+
+    deleteBtn.addEventListener('click', () => {
+        openDeleteModal();
+    });
+    deleteClose.addEventListener('click', closeDeleteModal);
+    cancelDelete.addEventListener('click', closeDeleteModal);
+    window.addEventListener('click', (e) => { if (e.target === deleteModal) closeDeleteModal(); });
+
+    confirmDelete.addEventListener('click', async function () {
+        const id = parseInt(form.dataset.listingId);
+        if (!id) return;
+        try {
+            const resp = await fetch(`/api/listings/${id}`, { method: 'DELETE', credentials: 'include' });
+            if (!resp.ok) {
+                const t = await resp.text();
+                alert('Ошибка удаления: ' + t);
+                return;
+            }
+            listingsData = listingsData.filter(l => l.id !== id);
+            renderListings(listingsData);
+            closeDeleteModal();
+            closeEditModal();
+        } catch (err) {
+            console.error('Ошибка удаления', err);
+            alert('Ошибка сети при удалении');
+        }
+    });
 }
 
 let viewModalLoaded = false;
