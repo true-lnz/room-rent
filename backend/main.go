@@ -6,6 +6,7 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
+	"github.com/gofiber/template/html/v2"
 )
 
 type application struct {
@@ -18,6 +19,8 @@ type application struct {
 func main() {
 	// Загружаем переменные окружения из .env файла
 	loadEnv()
+
+	engine := html.New("../frontend", ".html")
 
 	// Подключение к базе данных
 	db := Connect()
@@ -32,6 +35,7 @@ func main() {
 
 	appFiber := fiber.New(fiber.Config{
 		BodyLimit: 100 * 1024 * 1024,
+		Views:     engine,
 	})
 
 	appFiber.Use(cors.New(cors.Config{
@@ -82,9 +86,9 @@ func main() {
 	appFiber.Get("/mainpage.js", func(c *fiber.Ctx) error {
 		return c.SendFile("../frontend/mainpage/mainpage.js")
 	})
-	appFiber.Get("/authorization", func(c *fiber.Ctx) error {
+	/*	appFiber.Get("/authorization", func(c *fiber.Ctx) error {
 		return c.Redirect("/frontend/authorization/authorization.html", fiber.StatusFound)
-	})
+	})*/
 	appFiber.Get("/add", func(c *fiber.Ctx) error {
 		return c.Redirect("/frontend/add_listing/add-listing.html", fiber.StatusFound)
 	})
@@ -96,11 +100,16 @@ func main() {
 	})
 
 	// Прямые ссылки на файлы внутри /frontend (для существующей логики фронта)
-	appFiber.Get("/frontend/mainpage/mainpage.html", func(c *fiber.Ctx) error {
-		return c.SendFile("../frontend/mainpage/mainpage.html")
+	//appFiber.Get("/frontend/mainpage/mainpage.html", func(c *fiber.Ctx) error {
+	//	return c.SendFile("../frontend/mainpage/mainpage.html")
+	//})
+
+	appFiber.Get("/", func(c *fiber.Ctx) error {
+		return c.Render("mainpage/mainpage", fiber.Map{})
 	})
-	appFiber.Get("/frontend/authorization/authorization.html", func(c *fiber.Ctx) error {
-		return c.SendFile("../frontend/authorization/authorization.html")
+
+	appFiber.Get("/auth", func(c *fiber.Ctx) error {
+		return c.Render("authorization/authorization", fiber.Map{})
 	})
 	appFiber.Get("/frontend/add_listing/add-listing.html", func(c *fiber.Ctx) error {
 		return c.SendFile("../frontend/add_listing/add-listing.html")
