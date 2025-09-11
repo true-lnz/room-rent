@@ -58,8 +58,6 @@ func main() {
 	appFiber.Static("/frontend", "../frontend")
 	// Папка с загруженными изображениями
 	appFiber.Static("/uploads", "../upload")
-	// Корень сайта отдаёт главную страницу и её статику
-	appFiber.Static("/", "../frontend/mainpage", fiber.Static{Index: "mainpage.html"})
 
 	apiGroup := appFiber.Group("/api")
 	apiGroup.Post("/register", app.Register())
@@ -74,11 +72,6 @@ func main() {
 	apiGroup.Get("/my-bookings", app.GetMyBookings())
 	apiGroup.Delete("/listings/:id", app.DeleteListing())
 
-	// Page routes
-	appFiber.Get("/main", func(c *fiber.Ctx) error {
-		return c.Redirect("/", fiber.StatusFound)
-	})
-
 	// Статические файлы главной страницы по корню
 	appFiber.Get("/mainpage.css", func(c *fiber.Ctx) error {
 		return c.SendFile("../frontend/mainpage/mainpage.css")
@@ -86,42 +79,24 @@ func main() {
 	appFiber.Get("/mainpage.js", func(c *fiber.Ctx) error {
 		return c.SendFile("../frontend/mainpage/mainpage.js")
 	})
-	/*	appFiber.Get("/authorization", func(c *fiber.Ctx) error {
-		return c.Redirect("/frontend/authorization/authorization.html", fiber.StatusFound)
-	})*/
-	appFiber.Get("/add", func(c *fiber.Ctx) error {
-		return c.Redirect("/frontend/add_listing/add-listing.html", fiber.StatusFound)
-	})
-	appFiber.Get("/personal", func(c *fiber.Ctx) error {
-		return c.Redirect("/frontend/personal_acc/personal_acc.html", fiber.StatusFound)
-	})
-	appFiber.Get("/my-listings", func(c *fiber.Ctx) error {
-		return c.Redirect("/frontend/personal_acc/my_listings.html", fiber.StatusFound)
-	})
 
-	// Прямые ссылки на файлы внутри /frontend (для существующей логики фронта)
-	//appFiber.Get("/frontend/mainpage/mainpage.html", func(c *fiber.Ctx) error {
-	//	return c.SendFile("../frontend/mainpage/mainpage.html")
-	//})
-
+	// Page routes
 	appFiber.Get("/", func(c *fiber.Ctx) error {
 		return c.Render("mainpage/mainpage", fiber.Map{})
 	})
-
 	appFiber.Get("/auth", func(c *fiber.Ctx) error {
 		return c.Render("authorization/authorization", fiber.Map{})
 	})
-	appFiber.Get("/frontend/add_listing/add-listing.html", func(c *fiber.Ctx) error {
-		return c.SendFile("../frontend/add_listing/add-listing.html")
+	appFiber.Get("/add", func(c *fiber.Ctx) error {
+		return c.Render("add_listing/add-listing", fiber.Map{})
 	})
-	appFiber.Get("/frontend/personal_acc/personal_acc.html", func(c *fiber.Ctx) error {
-		return c.SendFile("../frontend/personal_acc/personal_acc.html")
+	appFiber.Get("/personal", func(c *fiber.Ctx) error {
+		return c.Render("personal_acc/personal_acc", fiber.Map{})
 	})
-	appFiber.Get("/frontend/personal_acc/my_listings.html", func(c *fiber.Ctx) error {
-		return c.SendFile("../frontend/personal_acc/my_listings.html")
+	appFiber.Get("/my-listings", func(c *fiber.Ctx) error {
+		return c.Render("personal_acc/my_listings", fiber.Map{})
 	})
 
-	// Получаем порт из переменных окружения
 	port := getEnv("PORT", "8080")
 
 	log.Printf("Сервер запущен на http://localhost:%s", port)
