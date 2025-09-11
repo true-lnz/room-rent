@@ -47,6 +47,20 @@
     margin: 0 0 8px 0;
 }
 
+/* Текст в модалке: читаемый многострочный формат */
+.modal-body p {
+    line-height: 1.5;
+}
+.modal-body p span {
+    white-space: normal;           /* разрешаем перенос */
+    word-break: break-word;        /* переносим длинные слова/цифры */
+    overflow-wrap: anywhere;       /* браузер может переносить где угодно при необходимости */
+}
+.modal-body p strong {
+    display: block;                /* подпись на отдельной строке */
+    margin-bottom: 4px;
+}
+
 .listing-address {
     font-size: 13px;
     color: #888;
@@ -196,6 +210,10 @@ footer p {
     max-width: 600px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     position: relative;
+}
+
+.modal-body p {
+    margin: 6px 0;
 }
 
 /* Компоновка модалки удаления, стили уже общие; дополнительные не требуются */

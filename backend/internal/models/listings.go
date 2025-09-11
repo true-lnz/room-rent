@@ -3,13 +3,14 @@ package models
 import "database/sql"
 
 type Listing struct {
-	ID      int    `json:"id"`
-	Type    string `json:"type"`
-	City    string `json:"city"`
-	Address string `json:"address"`
-	Price   string `json:"price"`
-	Comment string `json:"comment"`
-	UserID  int    `json:"user_id"`
+	ID          int    `json:"id"`
+	Type        string `json:"type"`
+	City        string `json:"city"`
+	Address     string `json:"address"`
+	Price       string `json:"price"`
+	Description string `json:"description"`
+	Comment     string `json:"comment"`
+	UserID      int    `json:"user_id"`
 }
 
 type ListingImage struct {
@@ -25,10 +26,10 @@ type ListingModel struct {
 func (m *ListingModel) Save(listing Listing) (int, error) {
 	var id int
 	err := m.DB.QueryRow(`
-		INSERT INTO buildings (name, city, address, cost_per_day, user_id, comment)
-		VALUES ($1, $2, $3, $4, $5, $6)
+		INSERT INTO buildings (name, city, address, cost_per_day, user_id, description, user_comment)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
 		RETURNING building_id
-	`, listing.Type, listing.City, listing.Address, listing.Price, listing.UserID, listing.Comment).Scan(&id)
+	`, listing.Type, listing.City, listing.Address, listing.Price, listing.UserID, listing.Description, listing.Comment).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
@@ -37,7 +38,7 @@ func (m *ListingModel) Save(listing Listing) (int, error) {
 
 func (m *ListingModel) ListLatest(limit int) ([]Listing, error) {
 	rows, err := m.DB.Query(`
-		SELECT building_id, name, city, address, cost_per_day::text, comment, user_id
+		SELECT building_id, name, city, address, cost_per_day::text, description, COALESCE(user_comment,''), user_id
 		FROM buildings
 		ORDER BY building_id DESC
 		LIMIT $1
@@ -50,7 +51,7 @@ func (m *ListingModel) ListLatest(limit int) ([]Listing, error) {
 	var listings []Listing
 	for rows.Next() {
 		var l Listing
-		if err := rows.Scan(&l.ID, &l.Type, &l.City, &l.Address, &l.Price, &l.Comment, &l.UserID); err != nil {
+		if err := rows.Scan(&l.ID, &l.Type, &l.City, &l.Address, &l.Price, &l.Description, &l.Comment, &l.UserID); err != nil {
 			return nil, err
 		}
 		listings = append(listings, l)
@@ -63,7 +64,7 @@ func (m *ListingModel) ListLatest(limit int) ([]Listing, error) {
 
 func (m *ListingModel) ListByUserID(userID int) ([]Listing, error) {
 	rows, err := m.DB.Query(`
-		SELECT building_id, name, city, address, cost_per_day::text, comment, user_id
+		SELECT building_id, name, city, address, cost_per_day::text, description, COALESCE(user_comment,''), user_id
 		FROM buildings
 		WHERE user_id = $1
 		ORDER BY building_id DESC
@@ -76,7 +77,7 @@ func (m *ListingModel) ListByUserID(userID int) ([]Listing, error) {
 	var listings []Listing
 	for rows.Next() {
 		var l Listing
-		if err := rows.Scan(&l.ID, &l.Type, &l.City, &l.Address, &l.Price, &l.Comment, &l.UserID); err != nil {
+		if err := rows.Scan(&l.ID, &l.Type, &l.City, &l.Address, &l.Price, &l.Description, &l.Comment, &l.UserID); err != nil {
 			return nil, err
 		}
 		listings = append(listings, l)

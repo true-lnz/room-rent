@@ -175,6 +175,10 @@ body {
     font-size: 14px;
     color: #666;
     margin: 0 0 8px 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* до двух строк */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .listing-address {
@@ -322,6 +326,19 @@ footer a:hover {
     font-size: 14px;
     color: #666;
     margin: 5px 0;
+}
+
+/* Улучшенное отображение текста в модалке: перенос длинных слов/чисел */
+.modal-content p { line-height: 1.5; }
+.modal-content .modal-description,
+.modal-content .modal-comment,
+.modal-content .modal-city,
+.modal-content .modal-address {
+    white-space: normal;        /* разрешаем перенос */
+    word-break: break-word;     /* переносим длинные "слова" и числа */
+    overflow-wrap: anywhere;    /* можно переносить где угодно при нехватке места */
+    display: inline;            /* остаётся на одной строке с подписью, но переносится ниже при необходимости */
+    max-width: 100%;
 }
 
 .booking-form {

@@ -68,7 +68,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     const getTypeName = (code) => ({
         storage: 'Кладовка',
         office: 'Офис',
-        retail: 'Торговое помещение'
+        retail: 'Торговое помещение',
+        warehouse: 'Склад',
+        garage: 'Гараж'
     }[code] || code);
 
     const getCityName = (codeOrRu) => {
@@ -219,12 +221,14 @@ document.addEventListener('DOMContentLoaded', async function() {
         const titleEl = document.querySelector('.modal-title');
         const priceEl = document.querySelector('.modal-price');
         const descrEl = document.querySelector('.modal-description');
+        const commentEl = document.querySelector('.modal-comment');
         const cityEl = document.querySelector('.modal-city');
         const addrEl = document.querySelector('.modal-address');
         const imgEl = document.querySelector('.modal-image');
         if (titleEl) titleEl.textContent = title;
         if (priceEl) priceEl.textContent = `${priceNum.toLocaleString()} ₽/мес`;
-        if (descrEl) descrEl.textContent = listing.comment || '';
+        if (descrEl) descrEl.textContent = listing.description || '';
+        if (commentEl) commentEl.textContent = listing.comment || '';
         if (cityEl) cityEl.textContent = `Город: ${getCityName(listing.city)}`;
         if (addrEl) addrEl.textContent = `Адрес: ${listing.address}`;
         if (imgEl) imgEl.src = img;
@@ -247,7 +251,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             <div class="listing-content">
                 <h3 class="listing-title">${title}</h3>
                 <p class="listing-price">${priceNum.toLocaleString()} ₽/мес</p>
-                <p class="listing-description">${listing.comment || ''}</p>
+                <p class="listing-description">${listing.description || ''}</p>
                 <p class="listing-address">${listing.address}</p>
                 <div class="listing-actions">
                     <button class="btn btn-primary" data-id="${listing.id}">Забронировать</button>

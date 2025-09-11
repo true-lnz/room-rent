@@ -340,18 +340,20 @@ func AddListingHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 type ListingRequest struct {
-	Type      string `json:"type"`
-	City      string `json:"city"`
-	Address   string `json:"address"`
-	Price     string `json:"price"`
-	Comment   string `json:"comment"`
-	UserEmail string `json:"user_email"`
+	Type        string `json:"type"`
+	City        string `json:"city"`
+	Address     string `json:"address"`
+	Price       string `json:"price"`
+	Description string `json:"description"`
+	Comment     string `json:"comment"`
+	UserEmail   string `json:"user_email"`
 }
 
 func (app *application) SaveListingPost(c *fiber.Ctx) error {
-	// Проверяем авторизацию
-	token := c.Cookies("session_token")
-	if token == "" {
+	// Проверяем авторизацию: cookie или Authorization
+	sess := c.Cookies("session_token")
+	authHeader := c.Get("Authorization")
+	if sess == "" && authHeader == "" {
 		return fiber.NewError(fiber.StatusUnauthorized, "Не авторизован")
 	}
 
@@ -359,6 +361,11 @@ func (app *application) SaveListingPost(c *fiber.Ctx) error {
 	var listingReq ListingRequest
 	if err := c.BodyParser(&listingReq); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Ошибка парсинга данных")
+	}
+
+	// Валидация описания: минимум 10, максимум 100 символов
+	if len([]rune(listingReq.Description)) < 10 || len([]rune(listingReq.Description)) > 100 {
+		return fiber.NewError(fiber.StatusBadRequest, "Описание должно быть от 10 до 100 символов")
 	}
 
 	// Получаем user_id по email
@@ -370,12 +377,13 @@ func (app *application) SaveListingPost(c *fiber.Ctx) error {
 
 	// Создаём объект для сохранения
 	listing := models.Listing{
-		Type:    listingReq.Type,
-		City:    listingReq.City,
-		Address: listingReq.Address,
-		Price:   listingReq.Price,
-		Comment: listingReq.Comment,
-		UserID:  user.ID,
+		Type:        listingReq.Type,
+		City:        listingReq.City,
+		Address:     listingReq.Address,
+		Price:       listingReq.Price,
+		Description: listingReq.Description,
+		Comment:     listingReq.Comment,
+		UserID:      user.ID,
 	}
 
 	// Сохраняем в БД и получаем ID

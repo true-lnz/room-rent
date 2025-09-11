@@ -52,22 +52,28 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         // Собираем данные формы
+        const description = (document.getElementById('description').value || '').trim();
+        if (description.length < 10) {
+            alert('Описание должно быть не короче 10 символов');
+            return;
+        }
         const formData = {
             type: document.getElementById('type').value,
             city: document.getElementById('city').value,
             address: document.getElementById('address').value,
             price: document.getElementById('price').value,
-            comment: document.getElementById('comment').value,
+            description: description,
+            comment: (document.getElementById('comment').value || '').trim(),
             user_email: userEmail // Добавляем email пользователя
         };
 
         try {
             console.log('[add] sending', formData);
-            // 1) Создаём объявление
             const response = await fetch('/api/add-listing', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    ...(token ? { 'Authorization': `Bearer ${token}` } : {})
                 },
                 credentials: 'include',
                 body: JSON.stringify(formData)
