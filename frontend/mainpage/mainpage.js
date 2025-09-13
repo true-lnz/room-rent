@@ -89,9 +89,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Инициализация
     renderListings(listingsData);
-    document.querySelector('.close-btn').addEventListener('click', () => {
-        document.getElementById('modal').style.display = 'none';
-    });
+
 
     // Тоггл фильтров
     document.querySelectorAll('.filter-btn').forEach(btn => {
