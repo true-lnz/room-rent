@@ -1,42 +1,114 @@
-/* Основные стили */
+/* Блок: header */
+.header {
+    width: 100%;
+    margin: 1rem;
+    padding: 0.75rem 1rem;
+    background: #F9FBFF;
+    border: 1px solid #dcdcdc;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: calc(100% - 2rem); /* чтобы учесть отступы */
+    box-sizing: border-box;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.header__container {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    width: 100%;
+}
+
+/* Блок: logo */
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+    text-decoration: none;
+}
+
+.logo__image {
+    width: 240px;
+    height: 55px;
+    display: inline-block;
+}
+.header__btn {
+    margin-left: auto;   /* кнопка вправо */
+}
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: #F9FBFF;
 }
 
-/* Новая шапка */
-.header-nav {
+.nav {
     display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding: 15px;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    gap: 2rem;          /* ← это расстояние между ссылками */
+    align-items: center;
+}
+.nav__item {
+    color: #B0B0B0;
+    text-decoration: none;   /* Убирает подчёркивание */
+}
+.nav__item:hover {
+    color: #424242;        /* Синий цвет при наведении */
 }
 
-.user-nav, .main-nav {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+.btn {
+    padding: 0.5rem 1.2rem;
+    border: none;
+    border-radius: 6px;
+    font-family: Arial, sans-serif;
+    font-size: 0.95rem;               /* Размер текста */
+}
+/* (Админ-панель) */
+.btn--primary {
+    background-color: #305BAB;
+    color: #F9FBFF;
 }
 
-.nav-btn {
-    padding: 8px 15px;
-    background-color: #f5f5f5;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    cursor: pointer;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-    transition: all 0.2s;
+/* При наведении мыши */
+.btn--primary:hover {
+    background-color: #426BB9;        /* Более светло-синий при наведении */
 }
 
-.nav-btn:hover {
-    background-color: #e9e9e9;
+footer {
+    position: fixed;              /* Приклеиваем к окну браузера */
+    bottom: 0;                    /* Прямо к нижнему краю */
+    left: 0;                      /* От левого края */
+    width: 100%;                  /* На всю ширину */
+
+    background-color: #F9FBFF;    /* Фон как у тебя */
+    border-top: 1px solid #B0B0B0; /* Линия сверху — граница (выглядит аккуратнее, чем all) */
+
+    padding: 0.75rem 1rem;        /* Отступы внутри */
+    display: flex;                /* Чтобы выстроить элементы в строку */
+    justify-content: center;      /* По центру (или space-around, если хочешь отступы между) */
+    align-items: center;          /* По вертикали — по центру */
+    gap: 2rem;                    /* Расстояние между © и ссылкой */
+
+    color: #B0B0B0;               /* Цвет текста по умолчанию */
+    font-size: 0.9rem;
+    font-family: Arial, sans-serif;
+    z-index: 1000;                /* Чтобы был поверх других элементов */
+}
+
+/* Стиль для ссылки */
+footer a {
+    color: #B0B0B0;               /* Цвет ссылки */
+    text-decoration: none;        /* Убираем подчёркивание */
+}
+
+footer a:hover {
+    text-decoration: underline;   /* Подчёркивание при наведении */
+    color: #424242;               /* Можно сделать чуть ярче */
 }
 
 /* Заголовок фильтров */
@@ -45,7 +117,6 @@ body {
     font-size: 20px;
     color: #2a5885;
 }
-
 /* Фильтры */
 .filters {
     display: flex;
@@ -126,7 +197,6 @@ body {
     border-radius: 4px;
     cursor: pointer;
 }
-
 /* Список объявлений */
 .listings {
     display: grid;
@@ -177,6 +247,7 @@ body {
     margin: 0 0 8px 0;
     display: -webkit-box;
     -webkit-line-clamp: 2; /* до двух строк */
+
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
@@ -190,56 +261,6 @@ body {
 .listing-actions {
     display: flex;
     gap: 10px;
-}
-
-.btn {
-    padding: 8px 15px;
-    border-radius: 4px;
-    font-size: 14px;
-    cursor: pointer;
-    text-align: center;
-    transition: all 0.2s;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn-primary {
-    background-color: #2a5885;
-    color: white;
-    border: none;
-}
-
-.btn-primary:hover {
-    background-color: #1d466c;
-}
-
-.btn-secondary {
-    background-color: white;
-    color: #2a5885;
-    border: 1px solid #2a5885;
-}
-
-.btn-secondary:hover {
-    background-color: #f0f7ff;
-}
-
-/* Подвал */
-footer {
-    padding: 20px 15px;
-    text-align: center;
-    font-size: 13px;
-    color: #777;
-    border-top: 1px solid #eee;
-    background-color: white;
-}
-
-footer a {
-    color: #2a5885;
-    text-decoration: none;
-}
-
-footer a:hover {
-    text-decoration: underline;
 }
 
 /* Кнопка сброса фильтров */
@@ -256,108 +277,4 @@ footer a:hover {
 
 #reset-filters:hover {
     background-color: #f0f7ff;
-}
-
-/* Адаптивность */
-@media (max-width: 768px) {
-    .filters {
-        flex-direction: column;
-    }
-    
-    .dropdown {
-        width: 100%;
-    }
-}
-/* Модальное окно */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    width: 90%;
-    max-width: 500px;
-    position: relative;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.close-btn {
-    position: absolute;
-    top: 10px;
-    right: 15px;
-    font-size: 24px;
-    font-weight: bold;
-    color: #555;
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-
-.close-btn:hover {
-    color: #000;
-}
-
-.modal-title {
-    font-size: 18px;
-    color: #2a5885;
-    margin: 0 0 10px 0;
-}
-
-.modal-price {
-    font-size: 16px;
-    font-weight: bold;
-    margin: 0 0 10px 0;
-}
-
-.modal-description,
-.modal-city,
-.modal-address {
-    font-size: 14px;
-    color: #666;
-    margin: 5px 0;
-}
-
-/* Улучшенное отображение текста в модалке: перенос длинных слов/чисел */
-.modal-content p { line-height: 1.5; }
-.modal-content .modal-description,
-.modal-content .modal-comment,
-.modal-content .modal-city,
-.modal-content .modal-address {
-    white-space: normal;        /* разрешаем перенос */
-    word-break: break-word;     /* переносим длинные "слова" и числа */
-    overflow-wrap: anywhere;    /* можно переносить где угодно при нехватке места */
-    display: inline;            /* остаётся на одной строке с подписью, но переносится ниже при необходимости */
-    max-width: 100%;
-}
-
-.booking-form {
-    margin-top: 15px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-
-.booking-form input[type="date"] {
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-/* Адаптив */
-@media (max-width: 600px) {
-    .modal-content {
-        width: 95%;
-        padding: 15px;
-    }
 }
