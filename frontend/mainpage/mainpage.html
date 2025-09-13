@@ -7,19 +7,9 @@
     <link rel="stylesheet" href="mainpage.css">
 </head>
 <body>
-    <!-- Новая шапка -->
-    <div class="header-nav">
-        <div class="user-nav">
-            <a href="/personal" class="nav-btn">Мои бронирования</a>
-            <a href="/my-listings" class="nav-btn">Мои объявления</a>
-        </div>
-        <div class="main-nav">
-            <a href="/" class="nav-btn">Главная страница</a>
-            <a href="/add" class="nav-btn">Добавить объявление</a>
-        </div>
-    </div>
+{{template "header"}}
 
-    <!-- Заголовок фильтров -->
+<!-- Заголовок фильтров -->
     <h1 class="filters-title">Фильтры</h1>
     
     <!-- Фильтры -->
@@ -78,13 +68,10 @@
     <div class="listings" id="listings-container">
         <!-- Будет заполнено через JavaScript -->
     </div>
-    
-    <!-- Подвал -->
-    <footer>
-        <p>© 2025. Все права защищены</p>
-        <a href="/privacy">Политика конфиденциальности</a>
-    </footer>
+
+
     <!-- Модальное окно -->
+<!--
     <div class="modal" id="modal">
         <div class="modal-content">
             <button class="close-btn">&times;</button>
@@ -103,7 +90,8 @@
             </form>
         </div>
     </div>
-
+    -->
+{{template "footer"}}
     <script src="mainpage.js"></script>
 </body>
 </html>
