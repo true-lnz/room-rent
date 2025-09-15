@@ -37,7 +37,7 @@ func (app *application) Register() fiber.Handler {
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка хэширования пароля")
 		}
 
-		err = app.users.Insert(u.Email, string(hashedPassword), role)
+		err = app.users.Insert(u.FirstName, u.LastName, u.Patronymic, u.Email, string(hashedPassword), role)
 		if err != nil {
 			return fiber.NewError(fiber.StatusConflict, "Ошибка регистрации")
 		}

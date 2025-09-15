@@ -9,15 +9,31 @@ function showRegister(){
 }
 
 async function register(){
-  const email = document.getElementById("reg-email").value;
+  const firstName = document.getElementById("reg-firstname").value.trim();
+  const lastName = document.getElementById("reg-lastname").value.trim();
+  const patronymic = document.getElementById("reg-patronymic").value.trim();
+  const email = document.getElementById("reg-email").value.trim();
   const password = document.getElementById("reg-password").value;
   const confirm = document.getElementById("reg-confirm").value;
   const role = document.querySelector('input[name="role"]:checked').value;
+  
+  if (!firstName || !lastName || !email || !password) {
+    alert("Заполните все обязательные поля");
+    return;
+  }
+  
   if(password !== confirm){ alert("Пароли не совпадают"); return; }
   const res = await fetch("/api/register",{
     method:"POST",
     headers:{"Content-Type":"application/json"},
-    body: JSON.stringify({email, password, role})
+    body: JSON.stringify({
+      first_name: firstName, 
+      last_name: lastName, 
+      patronymic: patronymic,
+      email, 
+      password, 
+      role
+    })
   });
   if(res.ok){ alert("Регистрация прошла успешно"); showLogin(); }
   else{ alert("Ошибка: "+ await res.text()); }
