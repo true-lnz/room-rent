@@ -44,7 +44,6 @@ function renderListings(listings) {
             <div class="listing-content">
                 <h3 class="listing-title">${title}</h3>
                 <p class="listing-price">${priceNum.toLocaleString()} ₽/мес</p>
-                <p><strong>Описание:</strong> ${listing.description || ''}</p>
                 <p><strong>Комментарий:</strong> ${listing.comment || ''}</p>
                 <p class="listing-address">${listing.address}</p>
                 <div class="listing-actions">
@@ -66,7 +65,6 @@ function openEditModal(listing) {
     document.getElementById('edit-city').value = listing.city;
     document.getElementById('edit-address').value = listing.address;
     document.getElementById('edit-price').value = parseInt(listing.price) || 0;
-    document.getElementById('edit-description').value = listing.description || '';
     document.getElementById('edit-form').dataset.listingId = listing.id;
     document.getElementById('edit-modal').style.display = 'block';
 }
@@ -88,7 +86,6 @@ function setupEditForm() {
             city: document.getElementById('edit-city').value,
             address: document.getElementById('edit-address').value,
             price: String(parseInt(document.getElementById('edit-price').value) || 0),
-            description: document.getElementById('edit-description').value
         };
         renderListings(listingsData);
         closeEditModal();
@@ -153,7 +150,6 @@ async function openViewModal(listing) {
     document.getElementById('modal-city').textContent = listing.city;
     document.getElementById('modal-address').textContent = listing.address;
     document.getElementById('modal-price').textContent = (parseInt(listing.price)||0).toLocaleString();
-    document.getElementById('modal-description').textContent = listing.description || '';
     // убедимся, что строка комментария существует
     let userCommentEl = document.getElementById('modal-user-comment');
     if (!userCommentEl) {

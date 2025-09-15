@@ -4,22 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить объявление</title>
-    <link rel="stylesheet" href="add-listing.css">
+    <link rel="stylesheet" href="/frontend/components/header-footer.css">
+    <link rel="stylesheet" href="/frontend/add_listing/add-listing.css">
 </head>
 <body>
-    <!-- Хедер -->
-    <div class="header-nav">
-        <a href="/frontend/mainpage/mainpage.html" class="nav-btn">Главная страница</a>
-        <a href="/frontend/personal_acc/personal_acc.html" class="nav-btn">Мои бронирования</a>
-    </div>
-
+{{template "header"}}
     <!-- Основной контент -->
     <div class="container">
         <h1>Добавить объявление</h1>
         <form id="listing-form" novalidate>
             <!-- Блок загрузки изображения -->
             <div class="image-upload">
-                <img src="https://via.placeholder.com/200x200/cccccc/666666?text=Загрузить+фото" alt="Изображение 4х4" id="preview-image">
+                <img src="download-icon.png" alt="Изображение 3х4" id="preview-image">
                 <label for="image-upload">Вставить из</label>
                 <input type="file" id="image-upload" accept="image/*" style="display: none;">
             </div>
@@ -51,11 +47,6 @@
             </div>
 
             <div class="form-group">
-                <label for="description">Описание <span style="color: red;">*</span></label>
-                <textarea id="description" name="description" rows="5" placeholder="Опишите помещение, площадь, условия..." minlength="10" maxlength="100" required></textarea>
-            </div>
-
-            <div class="form-group">
                 <label for="comment">Комментарий (необязательно)</label>
                 <textarea id="comment" name="comment" rows="3" placeholder="Дополнительная информация"></textarea>
             </div>
@@ -63,12 +54,7 @@
             <button type="submit">Добавить объявление</button>
         </form>
     </div>
-
-    <!-- Футер -->
-    <footer>
-        <p>© 2025. Все права защищены<br>
-        <a href="/privacy">Политика конфиденциальности</a></p>
-    </footer>
+{{template "footer"}}
 
     <!-- Подключаем JS -->
     <script src="add-listing.js"></script>

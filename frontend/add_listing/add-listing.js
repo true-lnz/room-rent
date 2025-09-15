@@ -51,18 +51,12 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        // Собираем данные формы
-        const description = (document.getElementById('description').value || '').trim();
-        if (description.length < 10) {
-            alert('Описание должно быть не короче 10 символов');
-            return;
-        }
+
         const formData = {
             type: document.getElementById('type').value,
             city: document.getElementById('city').value,
             address: document.getElementById('address').value,
             price: document.getElementById('price').value,
-            description: description,
             comment: (document.getElementById('comment').value || '').trim(),
             user_email: userEmail // Добавляем email пользователя
         };

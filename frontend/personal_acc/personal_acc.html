@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
-    <link rel="stylesheet" href="personal_acc.css">
+    <link rel="stylesheet" href="/frontend/components/header-footer.css">
+    <link rel="stylesheet" href="/frontend/personal_acc/personal_acc.css">
 </head>
 <body>
-<header class="header">
-    <a href="/" class="btn btn-secondary">Главная страница</a>
-</header>
+{{template "header"}}
     <div class="container">
         <h1>Мои бронирования</h1>
         <div class="content">
@@ -26,9 +25,7 @@
             </div>
         </div>
     </div>
-        <footer>
-            <p>© 2025. Все права защищены<br>Политика конфиденциальности</p>
-        </footer>
+{{template "footer"}}
 <script>
 (function(){
   const fmtDate = (iso) => {
