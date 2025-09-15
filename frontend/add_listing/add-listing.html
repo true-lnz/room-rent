@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Добавить объявление</title>
+    <link rel="stylesheet" href="/public/main.css">
     <link rel="stylesheet" href="/frontend/components/header-footer.css">
     <link rel="stylesheet" href="/frontend/add_listing/add-listing.css">
 </head>
@@ -47,8 +48,13 @@
             </div>
 
             <div class="form-group">
-                <label for="comment">Комментарий (необязательно)</label>
-                <textarea id="comment" name="comment" rows="3" placeholder="Дополнительная информация"></textarea>
+                <label for="description">Описание <span style="color: red;">*</span></label>
+                <textarea id="description" name="description" rows="3" placeholder="Подробное описание помещения" required></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="user_comment">Комментарий (необязательно)</label>
+                <textarea id="user_comment" name="user_comment" rows="2" placeholder="Дополнительная информация"></textarea>
             </div>
 
             <button type="submit">Добавить объявление</button>

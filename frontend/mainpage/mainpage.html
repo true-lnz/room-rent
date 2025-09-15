@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Аренда помещений</title>
+    <link rel="stylesheet" href="/public/main.css">
     <link rel="stylesheet" href="/frontend/components/header-footer.css">
     <link rel="stylesheet" href="mainpage.css">
 </head>
@@ -70,16 +71,15 @@
 
 
     <!-- Модальное окно -->
-<!--
     <div class="modal" id="modal">
         <div class="modal-content">
-            =<button class="close-btn">&times;</button>
+            <button class="close-btn">&times;</button>
             <h2 class="modal-title"></h2>
             <p class="modal-price"></p>
+            <p class="modal-city"></p>
+            <p class="modal-address"></p>
             <p><strong>Описание:</strong> <span class="modal-description"></span></p>
             <p><strong>Комментарий:</strong> <span class="modal-comment"></span></p>
-            <p class"modal-city"></p>
-            <p class="modal-address"></p>
             <img class="modal-image" src="" alt="Фото помещения" style="width: 100%; height: 180px; object-fit: cover; margin: 10px 0;">
             <form class="booking-form">
                 <label>Выберите даты аренды:</label>
@@ -89,7 +89,6 @@
             </form>
         </div>
     </div>
-    -->
 {{template "footer"}}
 <script src="mainpage.js"></script>
 </body>

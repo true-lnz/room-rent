@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
+    <link rel="stylesheet" href="/public/main.css">
     <link rel="stylesheet" href="/frontend/components/header-footer.css">
     <link rel="stylesheet" href="/frontend/personal_acc/personal_acc.css">
 </head>
@@ -26,42 +27,7 @@
         </div>
     </div>
 {{template "footer"}}
-<script>
-(function(){
-  const fmtDate = (iso) => {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleDateString('ru-RU'); // DD.MM.YYYY
-  };
-  const fmtMoney = (n) => (Number(n)||0).toLocaleString('ru-RU') + ' ₽';
-
-  (async function(){
-    const token = localStorage.getItem('token');
-    if(!token){ window.location.href='/frontend/authorization/authorization.html'; return; }
-    let email='';
-    try{ email = JSON.parse(atob(token.split('.')[1])).email; }catch(e){ window.location.href='/frontend/authorization/authorization.html'; return; }
-    try{
-      const res = await fetch('/api/my-bookings?email='+encodeURIComponent(email));
-      const data = res.ok ? await res.json() : [];
-      const wrap = document.getElementById('bookings-container');
-      if(!data.length){ wrap.innerHTML = '<div class="no-results">Бронирований пока нет</div>'; return; }
-      wrap.innerHTML = data.map(b=>{
-        const period = `${fmtDate(b.start_date)} — ${fmtDate(b.end_date)}`;
-        const sum = fmtMoney(b.total_amount);
-        return `
-      <div class="booking_card">
-        <img src="image1.jpg" alt="Помещение" class="listing-image">
-        <div class="booking-info">
-          <p><strong>${b.type} — ${b.city}</strong></p>
-          <p>${b.address}</p>
-          <p>Период: ${period}</p>
-          <p>Сумма: ${sum}</p>
-        </div>
-      </div>`;
-      }).join('');
-    }catch(e){ console.error('Ошибка загрузки бронирований', e); }
-  })();
-})();
-</script>
+<script src="/public/app.js"></script>
+<script src="/frontend/personal_acc/personal_acc.js"></script>
 </body>
 </html>

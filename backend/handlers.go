@@ -125,18 +125,9 @@ func (app *application) GetAvailableListings() fiber.Handler {
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка получения объявлений")
 		}
 		defer rows.Close()
-		type L struct {
-			ID      int    `json:"id"`
-			Type    string `json:"type"`
-			City    string `json:"city"`
-			Address string `json:"address"`
-			Price   string `json:"price"`
-			Comment string `json:"comment"`
-			UserID  int    `json:"user_id"`
-		}
-		var list []L
+		var list []models.AvailableListing
 		for rows.Next() {
-			var l L
+			var l models.AvailableListing
 			if err := rows.Scan(&l.ID, &l.Type, &l.City, &l.Address, &l.Price, &l.Comment, &l.UserID); err != nil {
 				return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
 			}
@@ -194,19 +185,9 @@ func (app *application) GetMyBookings() fiber.Handler {
 		}
 		defer rows.Close()
 
-		type Booking struct {
-			ID          int    `json:"id"`
-			StartDate   string `json:"start_date"`
-			EndDate     string `json:"end_date"`
-			TotalAmount string `json:"total_amount"`
-			BuildingID  int    `json:"building_id"`
-			Type        string `json:"type"`
-			City        string `json:"city"`
-			Address     string `json:"address"`
-		}
-		var list []Booking
+		var list []models.BookingView
 		for rows.Next() {
-			var b Booking
+			var b models.BookingView
 			if err := rows.Scan(&b.ID, &b.StartDate, &b.EndDate, &b.TotalAmount, &b.BuildingID, &b.Type, &b.City, &b.Address); err != nil {
 				return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
 			}
@@ -222,12 +203,7 @@ func (app *application) GetMyBookings() fiber.Handler {
 // CreateBooking создаёт бронирование
 func (app *application) CreateBooking() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		var req struct {
-			BuildingID int    `json:"building_id"`
-			StartDate  string `json:"start_date"`
-			EndDate    string `json:"end_date"`
-			Email      string `json:"email"`
-		}
+		var req models.CreateBookingRequest
 		if err := c.BodyParser(&req); err != nil {
 			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат данных")
 		}
@@ -339,14 +315,7 @@ func AddListingHandler(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, staticPath)
 }
 
-type ListingRequest struct {
-	Type      string `json:"type"`
-	City      string `json:"city"`
-	Address   string `json:"address"`
-	Price     string `json:"price"`
-	Comment   string `json:"comment"`
-	UserEmail string `json:"user_email"`
-}
+// ListingRequest перенесён в internal/models/requests.go
 
 func (app *application) SaveListingPost(c *fiber.Ctx) error {
 	// Проверяем авторизацию: cookie или Authorization
@@ -357,7 +326,7 @@ func (app *application) SaveListingPost(c *fiber.Ctx) error {
 	}
 
 	// Читаем JSON
-	var listingReq ListingRequest
+	var listingReq models.ListingRequest
 	if err := c.BodyParser(&listingReq); err != nil {
 		return fiber.NewError(fiber.StatusBadRequest, "Ошибка парсинга данных")
 	}
@@ -371,12 +340,13 @@ func (app *application) SaveListingPost(c *fiber.Ctx) error {
 
 	// Создаём объект для сохранения
 	listing := models.Listing{
-		Type:    listingReq.Type,
-		City:    listingReq.City,
-		Address: listingReq.Address,
-		Price:   listingReq.Price,
-		Comment: listingReq.Comment,
-		UserID:  user.ID,
+		Name:        listingReq.Type, // type -> name
+		City:        listingReq.City,
+		Address:     listingReq.Address,
+		Price:       listingReq.Price,
+		Description: listingReq.Description,
+		UserComment: listingReq.UserComment,
+		UserID:      user.ID,
 	}
 
 	// Сохраняем в БД и получаем ID
@@ -481,8 +451,28 @@ func (app *application) DeleteListing() fiber.Handler {
 		if !exists {
 			return fiber.NewError(fiber.StatusNotFound, "Объявление не найдено")
 		}
-		if _, err := app.listings.DB.Exec("DELETE FROM buildings WHERE building_id=$1", id); err != nil {
+		// Удаляем в транзакции связанные записи, затем само объявление
+		tx, err := app.listings.DB.Begin()
+		if err != nil {
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка транзакции")
+		}
+		if _, err := tx.Exec("DELETE FROM building_images WHERE building_id=$1", id); err != nil {
+			tx.Rollback()
+			log.Println("Ошибка удаления изображений:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка удаления объявления")
+		}
+		if _, err := tx.Exec("DELETE FROM rent WHERE building_id=$1", id); err != nil {
+			tx.Rollback()
+			log.Println("Ошибка удаления бронирований:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка удаления объявления")
+		}
+		if _, err := tx.Exec("DELETE FROM buildings WHERE building_id=$1", id); err != nil {
+			tx.Rollback()
 			log.Println("Ошибка удаления объявления:", err)
+			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка удаления объявления")
+		}
+		if err := tx.Commit(); err != nil {
+			tx.Rollback()
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка удаления объявления")
 		}
 		return c.JSON(fiber.Map{"message": "Объявление удалено"})

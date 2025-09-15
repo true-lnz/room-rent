@@ -38,14 +38,16 @@ function renderListings(listings) {
         const img = imagesMap[listing.id] || 'image1.jpg';
         const priceNum = parseInt(listing.price) || 0;
         const title = `${translateType(listing.type)} — ${listing.city}`;
+        const description = listing.description || listing.comment || '';
         return `
         <div class="listing">
             <img src="${img}" alt="Фото помещения" class="listing-image">
             <div class="listing-content">
                 <h3 class="listing-title">${title}</h3>
                 <p class="listing-price">${priceNum.toLocaleString()} ₽/мес</p>
-                <p><strong>Комментарий:</strong> ${listing.comment || ''}</p>
                 <p class="listing-address">${listing.address}</p>
+                ${description ? `<p class="listing-description"><strong>Описание:</strong> ${description}</p>` : ''}
+                ${listing.user_comment ? `<p class="listing-user-comment"><strong>Комментарий:</strong> ${listing.user_comment}</p>` : ''}
                 <div class="listing-actions">
                     <button class="btn btn-primary" data-id="${listing.id}">Редактировать</button>
                     <button class="btn btn-secondary" data-id="${listing.id}">Посмотреть объявление</button>
@@ -144,28 +146,12 @@ async function openViewModal(listing) {
             return;
         }
     }
-    document.getElementById('modal-type').textContent = listing.type;
-    // Русский тип в модалке
     document.getElementById('modal-type').textContent = translateType(listing.type);
     document.getElementById('modal-city').textContent = listing.city;
     document.getElementById('modal-address').textContent = listing.address;
     document.getElementById('modal-price').textContent = (parseInt(listing.price)||0).toLocaleString();
-    // убедимся, что строка комментария существует
-    let userCommentEl = document.getElementById('modal-user-comment');
-    if (!userCommentEl) {
-        const body = document.querySelector('#view-modal .modal-body');
-        const img = document.getElementById('modal-image');
-        const p = document.createElement('p');
-        const strong = document.createElement('strong');
-        strong.textContent = 'Комментарий: ';
-        userCommentEl = document.createElement('span');
-        userCommentEl.id = 'modal-user-comment';
-        userCommentEl.style.color = '#666';
-        p.appendChild(strong);
-        p.appendChild(userCommentEl);
-        body.insertBefore(p, img); // вставляем перед картинкой
-    }
-    userCommentEl.textContent = listing.comment || '';
+    document.getElementById('modal-description').textContent = listing.description || listing.comment || '';
+    document.getElementById('modal-user-comment').textContent = listing.user_comment || '';
     document.getElementById('modal-image').src = imagesMap[listing.id] || 'image1.jpg';
     document.getElementById('view-modal').style.display = 'block';
     setupViewModalClose();

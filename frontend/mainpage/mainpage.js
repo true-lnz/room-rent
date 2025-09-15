@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     if (!token) {
         alert("Вы не авторизованы");
-        window.location.href = "/frontend/authorization/authorization.html";
+        window.location.href = "/auth";
         return;
     }
 
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     } catch (e) {
         alert("Ошибка токена. Войдите заново.");
         localStorage.removeItem("token");
-        window.location.href = "/frontend/authorization/authorization.html";
+        window.location.href = "/auth";
         return;
     }
 
@@ -114,6 +114,14 @@ document.addEventListener('DOMContentLoaded', async function() {
             modal.style.display = 'none';
         }
     });
+
+    // Закрытие по клику на кнопку закрытия
+    const closeBtn = document.querySelector('.close-btn');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            document.getElementById('modal').style.display = 'none';
+        });
+    }
 
     // Текущее объявление для бронирования
     let currentListingId = null;
@@ -218,13 +226,15 @@ document.addEventListener('DOMContentLoaded', async function() {
         const modal = document.getElementById('modal');
         const titleEl = document.querySelector('.modal-title');
         const priceEl = document.querySelector('.modal-price');
+        const descriptionEl = document.querySelector('.modal-description');
         const commentEl = document.querySelector('.modal-comment');
         const cityEl = document.querySelector('.modal-city');
         const addrEl = document.querySelector('.modal-address');
         const imgEl = document.querySelector('.modal-image');
         if (titleEl) titleEl.textContent = title;
         if (priceEl) priceEl.textContent = `${priceNum.toLocaleString()} ₽/мес`;
-        if (commentEl) commentEl.textContent = listing.comment || '';
+        if (descriptionEl) descriptionEl.textContent = listing.description || listing.comment || '';
+        if (commentEl) commentEl.textContent = listing.user_comment || '';
         if (cityEl) cityEl.textContent = `Город: ${getCityName(listing.city)}`;
         if (addrEl) addrEl.textContent = `Адрес: ${listing.address}`;
         if (imgEl) imgEl.src = img;
@@ -241,6 +251,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const title = `${getTypeName(listing.type)} — ${getCityName(listing.city)}`;
             const priceNum = parseInt(listing.price) || 0;
             const img = imagesMap[listing.id] || '/frontend/public/image1.jpg';
+            const description = listing.description || listing.comment || '';
             return `
         <div class="listing">
             <img src="${img}" alt="Фото помещения" class="listing-image">
@@ -248,6 +259,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 <h3 class="listing-title">${title}</h3>
                 <p class="listing-price">${priceNum.toLocaleString()} ₽/мес</p>
                 <p class="listing-address">${listing.address}</p>
+                ${description ? `<p class="listing-description">${description}</p>` : ''}
                 <div class="listing-actions">
                     <button class="btn btn-primary" data-id="${listing.id}">Забронировать</button>
                     <button class="btn btn-secondary" data-id="${listing.id}">Просмотреть</button>

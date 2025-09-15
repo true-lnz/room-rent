@@ -1,0 +1,147 @@
+/* Общие стили проекта */
+:root { 
+    --primary: #2a5885; 
+    --primary-hover: #426BB9;
+    --secondary: #F9FBFF;
+    --text-muted: #B0B0B0;
+    --text-dark: #424242;
+    --border: #ddd;
+}
+
+/* Базовые стили */
+* { box-sizing: border-box; }
+body { 
+    margin: 0; 
+    font-family: Arial, sans-serif; 
+    background-color: var(--secondary);
+}
+
+/* Общие стили кнопок */
+.btn {
+    padding: 8px 15px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+    border: none;
+    font-family: Arial, sans-serif;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-hover);
+}
+
+.btn-secondary {
+    background-color: var(--secondary);
+    color: #000000;
+    border: 1px solid #000000;
+}
+
+.btn-secondary:hover {
+    background-color: var(--text-dark);
+    color: var(--secondary);
+}
+
+/* Общие стили форм */
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: var(--text-dark);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px rgba(42, 88, 133, 0.1);
+}
+
+/* Общие стили модальных окон */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.35);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-content {
+    position: relative;
+    background: #fff;
+    width: min(520px, 92vw);
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 6px 24px rgba(0,0,0,0.2);
+}
+
+.close-btn {
+    position: absolute;
+    top: 8px; right: 8px;
+    border: 0; 
+    background: #eee; 
+    width: 28px; 
+    height: 28px;
+    border-radius: 4px; 
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.close-btn:hover {
+    background: #ddd;
+}
+
+/* Общие утилиты */
+.no-results { 
+    color: #666; 
+    padding: 16px; 
+    text-align: center;
+    font-style: italic;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+}
+
+/* Общие стили ссылок */
+a {
+    color: var(--primary);
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+

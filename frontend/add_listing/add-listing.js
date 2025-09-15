@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const token = localStorage.getItem("token");
     if (!token) {
         alert("Вы не авторизованы");
-        window.location.href = "/frontend/authorization/authorization.html";
+        window.location.href = "/auth";
         return;
     }
 
@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', function () {
     } catch (e) {
         alert("Ошибка токена. Войдите заново.");
         localStorage.removeItem("token");
-        window.location.href = "/frontend/authorization/authorization.html";
+        window.location.href = "/auth";
         return;
     }
 
@@ -57,7 +57,8 @@ document.addEventListener('DOMContentLoaded', function () {
             city: document.getElementById('city').value,
             address: document.getElementById('address').value,
             price: document.getElementById('price').value,
-            comment: (document.getElementById('comment').value || '').trim(),
+            description: (document.getElementById('description').value || '').trim(),
+            user_comment: (document.getElementById('user_comment').value || '').trim(),
             user_email: userEmail // Добавляем email пользователя
         };
 
