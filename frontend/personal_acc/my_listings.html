@@ -4,12 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет</title>
+    <link rel="stylesheet" href="/frontend/components/header-footer.css">
     <link rel="stylesheet" href="/frontend/personal_acc/my_listings.css">
 </head>
 <body>
-<header class="header">
-    <a href="/" class="btn btn-secondary">Главная страница</a>
-</header>
+{{template "header"}}
     <div class="container">
         <h1>Мои объявления</h1>
         <div class="listings" id="listings-container">
@@ -26,9 +25,7 @@
             </div>
         </div>
     </div>
-        <footer>
-            <p>© 2025. Все права защищены<br>Политика конфиденциальности</p>
-        </footer>
+{{template "footer"}}
 <script src="/frontend/personal_acc/my_listings.js"></script>
 
 <!-- Модальное окно редактирования -->
@@ -59,11 +56,6 @@
                 <div class="form-group">
                     <label for="edit-price">Цена в месяц *</label>
                     <input type="number" id="edit-price" required placeholder="10000">
-                </div>
-
-                <div class="form-group">
-                    <label for="edit-description">Описание *</label>
-                    <textarea id="edit-description" rows="4" required placeholder="Опишите помещение, площадь, условия..."></textarea>
                 </div>
 
                 <div class="edit-actions">

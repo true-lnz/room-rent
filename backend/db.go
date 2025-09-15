@@ -13,7 +13,7 @@ func Connect() *sql.DB {
 	dbHost := getEnv("DB_HOST", "localhost")
 	dbPort := getEnv("DB_PORT", "5432")
 	dbUser := getEnv("DB_USER", "postgres")
-	dbPassword := getEnv("DB_PASSWORD", "123")
+	dbPassword := getEnv("DB_PASSWORD", "admin")
 	dbName := getEnv("DB_NAME", "arenda")
 	dbSSLMode := getEnv("DB_SSLMODE", "disable")
 

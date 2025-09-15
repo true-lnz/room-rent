@@ -41,12 +41,6 @@
     margin: 0 0 8px 0;
 }
 
-.listing-description {
-    font-size: 14px;
-    color: #666;
-    margin: 0 0 8px 0;
-}
-
 /* Текст в модалке: читаемый многострочный формат */
 .modal-body p {
     line-height: 1.5;
@@ -72,23 +66,12 @@
     gap: 10px;
 }
 
-
-
 /* Основные стили */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f5f5f5;
-    color: #333;
-}
-
-.header {
-    display: flex;
-    justify-content: flex-start; /* прижимает содержимое к левому краю */
-    padding: 15px;
-    background-color: white;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #F9FBFF;
 }
 /* Кнопки */
 .btn {
@@ -117,12 +100,6 @@ body {
 .btn-secondary:hover {
     background-color: #f0f7ff;
 }
-
-/* Нижняя навигация */
-.footer-nav {
-    padding: 20px;
-    text-align: center;
-}
 .nav-btn {
     padding: 8px 15px;
     background-color: #f5f5f5;
@@ -143,21 +120,7 @@ body {
     height: 180px;
     object-fit: cover;
 }
-footer {
-    margin-top: 30px;
-    padding-top: 20px;
-    border-top: 1px solid #ddd; /* Более чёткая, но лёгкая линия */
-    font-size: 0.85em;
-    color: #666;
-    text-align: center;
-    background-color: #f9f9f9; /* Лёгкий фон для отделения */
-    width: 100%;
-    box-sizing: border-box;
-}
-footer p {
-    margin: 0 0 10px 0;
-    line-height: 1.6;
-}
+
 .container {
     display: flex;
     flex-direction: column;
@@ -215,8 +178,6 @@ footer p {
 .modal-body p {
     margin: 6px 0;
 }
-
-/* Компоновка модалки удаления, стили уже общие; дополнительные не требуются */
 
 .close {
     color: #aaa;
