@@ -32,6 +32,5 @@ func Connect() *sql.DB {
 		log.Fatal("БД недоступна:", err)
 	}
 
-	fmt.Println("✅ Подключено к PostgreSQL")
 	return db
 }

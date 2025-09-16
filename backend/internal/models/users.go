@@ -3,7 +3,6 @@ package models
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 )
 
 type User struct {
@@ -28,7 +27,6 @@ func (m *UserModel) Insert(firstName, lastName, patronymic, email, hashedPasswor
 		VALUES ($1, $2, $3, $4, $5, $6)`,
 		firstName, lastName, patronymic, email, hashedPassword, roleID,
 	)
-	fmt.Println(firstName, lastName, patronymic, email, hashedPassword, roleID)
 
 	return err
 }

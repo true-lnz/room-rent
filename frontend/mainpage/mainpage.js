@@ -43,10 +43,10 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (res.ok) {
             listingsData = await res.json();
         } else {
-            console.warn('Не удалось загрузить объявления:', await res.text());
+            //
         }
     } catch (e) {
-        console.error('Ошибка загрузки объявлений', e);
+        //
     }
 
     // Загрузим первое изображение для каждого объявления
@@ -195,10 +195,10 @@ document.addEventListener('DOMContentLoaded', async function() {
                         return priceOk && typeOk && cityOk;
                     });
                 } else {
-                    console.warn('Не удалось загрузить доступные объявления по датам:', await res.text());
+                    //
                 }
             } catch (e) {
-                console.error('Ошибка загрузки доступных объявлений по датам', e);
+                //
             }
         }
 

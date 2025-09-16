@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
     try {
         const payload = JSON.parse(atob(token.split('.')[1]));
         userEmail = payload.email;
-        console.log("Авторизован как:", userEmail);
+        //
     } catch (e) {
         alert("Ошибка токена. Войдите заново.");
         localStorage.removeItem("token");
@@ -63,7 +63,6 @@ document.addEventListener('DOMContentLoaded', function () {
         };
 
         try {
-            console.log('[add] sending', formData);
             const response = await fetch('/api/add-listing', {
                 method: 'POST',
                 headers: {
@@ -74,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 body: JSON.stringify(formData)
             });
             const raw = await response.text();
-            console.log('[add] raw response:', raw);
+            //
 
             if (!response.ok) {
                 alert('❌ Ошибка создания: ' + raw);
@@ -84,7 +83,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let created = {};
             try { created = JSON.parse(raw); } catch (_) {}
             const listingId = created?.id;
-            console.log('[add] created id:', listingId);
+            //
 
             // 2) Если выбран файл — загружаем его
             const file = imageUploadInput.files && imageUploadInput.files[0];
@@ -96,7 +95,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 const fd = new FormData();
                 fd.append('image', file);
-                console.log('[upload] start for listing', listingId, file.name, file.size);
+                //
                 // listing_id не обязателен, бек возьмёт id из пути
                 const uploadResp = await fetch(`/api/listings/${listingId}/images`, {
                     method: 'POST',
@@ -104,12 +103,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     credentials: 'include'
                 });
                 const uploadText = await uploadResp.text();
-                console.log('[upload] status:', uploadResp.status, 'resp:', uploadText);
+                //
                 if (!uploadResp.ok) {
                     alert('Объявление создано, но загрузка фото не удалась: ' + uploadText);
                 }
             } else {
-                console.log('[upload] пропуск: нет id или файла', { listingId, hasFile: !!file });
+                //
             }
 
             alert('✅ Объявление успешно добавлено!');

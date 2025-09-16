@@ -18,7 +18,7 @@ async function loadMyListings() {
         if (!res.ok) throw new Error(await res.text());
         return await res.json();
     } catch (e) {
-        console.error('Ошибка загрузки моих объявлений', e);
+        //
         return [];
     }
 }
@@ -126,7 +126,7 @@ function setupEditForm() {
             closeDeleteModal();
             closeEditModal();
         } catch (err) {
-            console.error('Ошибка удаления', err);
+            //
             alert('Ошибка сети при удалении');
         }
     });
@@ -141,7 +141,7 @@ async function openViewModal(listing) {
             document.body.insertAdjacentHTML('beforeend', html);
             viewModalLoaded = true;
         } catch (error) {
-            console.error('Ошибка загрузки view-modal.html:', error);
+            //
             alert('Не удалось загрузить окно просмотра.');
             return;
         }
