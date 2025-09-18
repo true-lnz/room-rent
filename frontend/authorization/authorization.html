@@ -13,28 +13,22 @@
 <div class="auth-container" id="register-container">
   <h2>Регистрация</h2>
   <div class="form-group">
-    <label for="reg-firstname">Имя <span style="color: red;">*</span></label>
-    <input type="text" id="reg-firstname" required>
+    <input class="form-input" type="text" id="reg-firstname" placeholder="Имя" required>
   </div>
   <div class="form-group">
-    <label for="reg-lastname">Фамилия <span style="color: red;">*</span></label>
-    <input type="text" id="reg-lastname" required>
+    <input class="form-input" type="text" id="reg-lastname" placeholder="Фамилия" required>
   </div>
   <div class="form-group">
-    <label for="reg-patronymic">Отчество (необязательно)</label>
-    <input type="text" id="reg-patronymic">
+    <input class="form-input" type="text" id="reg-patronymic" placeholder="Отчество (необязательно)">
   </div>
   <div class="form-group">
-    <label for="reg-email">Email <span style="color: red;">*</span></label>
-    <input type="email" id="reg-email" required>
+    <input class="form-input" type="email" id="reg-email" placeholder="Почта" required>
   </div>
   <div class="form-group">
-    <label for="reg-password">Пароль <span style="color: red;">*</span></label>
-    <input type="password" id="reg-password" required>
+    <input class="form-input" type="password" id="reg-password" placeholder="Пароль" required>
   </div>
   <div class="form-group">
-    <label for="reg-confirm">Повторите пароль <span style="color: red;">*</span></label>
-    <input type="password" id="reg-confirm" required>
+    <input class="form-input" type="password" id="reg-confirm" placeholder="Повторите пароль" required>
   </div>
   <div class="form-group">
     <label>Роль: <span style="color: red;">*</span></label>
@@ -48,14 +42,12 @@
 </div>
 
 <div class="auth-container" id="login-container" style="display:none">
-  <h2>Вход</h2>
+  <h2>Авторизация</h2>
   <div class="form-group">
-    <label for="login-email">Email</label>
-    <input type="email" id="login-email" required>
+    <input class="form-input" type="email" id="login-email" placeholder="Почта" required>
   </div>
   <div class="form-group">
-    <label for="login-password">Пароль</label>
-    <input type="password" id="login-password" required>
+    <input class="form-input" type="password" id="login-password" placeholder="Пароль" required>
   </div>
   <button class="btn" onclick="login()">Войти</button>
   <div class="toggle" onclick="showRegister()">Нет аккаунта? Зарегистрироваться</div>

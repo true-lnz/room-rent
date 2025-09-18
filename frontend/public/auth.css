@@ -1,24 +1,31 @@
 /* Специфичные стили страницы авторизации */
+body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
 
-.auth-container { 
-    max-width: 500px; 
-    margin: 0 auto; 
-    background: white; 
-    padding: 30px; 
-    border-radius: 8px; 
-    box-shadow: 0 0 10px rgba(0,0,0,0.1); 
+.auth-container {
+    min-width: 360px;
+    margin: auto;
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 15px;
+    border: 1px solid var(--border);
 }
 
 .auth-container h2 { 
-    margin-bottom: 20px; 
-    color: var(--primary); 
+    margin-bottom: 2rem;
+    color: var(--text-dark);
     text-align: center;
 }
 
-.auth-container .btn { 
+.auth-container .btn {
+    background: var(--darker);
+    color: #ffffff;
     padding: 10px; 
     width: 100%; 
-    font-size: 16px; 
 }
 
 .role-group { 
@@ -39,10 +46,16 @@
 }
 
 .toggle { 
-    text-align: center; 
+    font-size: .875rem;
+    text-align: center;
     margin-top: 20px; 
     cursor: pointer; 
-    color: var(--primary); 
+    color: var(--text-muted);
+    transition: color .3s ease;
+}
+
+.toggle:hover {
+    color: var(--darker);
 }
 
 

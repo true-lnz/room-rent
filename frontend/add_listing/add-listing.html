@@ -9,22 +9,22 @@
 </head>
 <body>
 {{template "header"}}
-    <!-- Основной контент -->
-    <div class="container">
-        <h1>Добавить объявление</h1>
-        <form id="listing-form" novalidate>
-            <!-- Блок загрузки изображения -->
+
+<div class="container">
+    <h1>Новое объявление</h1>
+    <form class="listing-form__grid" id="listing-form" novalidate>
+        <div class="form__container">
             <div class="image-upload">
                 <img src="download-icon.png" alt="Изображение 3х4" id="preview-image">
                 <label for="image-upload">Вставить из</label>
                 <input type="file" id="image-upload" accept="image/*" style="display: none;">
             </div>
+        </div>
 
-            <!-- Форма -->
+        <div class="form__container">
             <div class="form-group">
-                <label for="type">Тип помещения <span style="color: red;">*</span></label>
                 <select id="type" name="type" required>
-                    <option value="">Выберите тип</option>
+                    <option value="">Тип помещения</option>
                     <option value="storage">Кладовка</option>
                     <option value="office">Офис</option>
                     <option value="warehouse">Склад</option>
@@ -32,36 +32,40 @@
             </div>
 
             <div class="form-group">
-                <label for="city">Город <span style="color: red;">*</span></label>
-                <input type="text" id="city" name="city" placeholder="Например: Уфа" required>
+                <input type="text" id="city" name="city" placeholder="Город" required>
             </div>
 
             <div class="form-group">
-                <label for="address">Адрес <span style="color: red;">*</span></label>
-                <input type="text" id="address" name="address" placeholder="Улица, дом" required>
+                <input type="text" id="address" name="address" placeholder="Адрес" required>
             </div>
 
             <div class="form-group">
-                <label for="price">Цена в месяц <span style="color: red;">*</span></label>
-                <input type="number" id="price" name="price" placeholder="10000" min="1" required>
+                <input type="number" id="price" name="price" placeholder="Цена в месяц" min="1" required>
             </div>
+        </div>
 
+        <div class="form__container">
             <div class="form-group">
                 <label for="description">Описание <span style="color: red;">*</span></label>
-                <textarea id="description" name="description" rows="3" placeholder="Подробное описание помещения" required></textarea>
+                <textarea id="description" name="description" rows="3" placeholder="Подробное описание помещения"
+                          required></textarea>
             </div>
 
             <div class="form-group">
                 <label for="user_comment">Комментарий (необязательно)</label>
                 <textarea id="user_comment" name="user_comment" rows="2" placeholder="Дополнительная информация"></textarea>
             </div>
+        </div>
+    </form>
 
-            <button type="submit">Добавить объявление</button>
-        </form>
+    <div class="buttons" style="display: flex; gap: .5rem;">
+        <button class="btn btn-secondary">Отмена</button>
+        <button type="submit" form="listing-form">Добавить объявление</button>
     </div>
+
+</div>
 {{template "footer"}}
 
-    <!-- Подключаем JS -->
-    <script src="add-listing.js"></script>
+<script src="/frontend/add_listing/add-listing.js"></script>
 </body>
 </html>

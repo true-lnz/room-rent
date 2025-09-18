@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -30,14 +31,14 @@ func (app *application) Register() fiber.Handler {
 			return fiber.NewError(fiber.StatusConflict, "Пользователь с таким Email уже зарегистрирован")
 		}
 
-		role, _ := app.roles.FindByName(u.RoleName)
+		roleId, _ := app.roles.FindByName(u.RoleName)
 
 		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(u.Password), bcrypt.DefaultCost)
 		if err != nil {
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка хэширования пароля")
 		}
 
-		err = app.users.Insert(u.FirstName, u.LastName, u.Patronymic, u.Email, string(hashedPassword), role)
+		err = app.users.Insert(u.FirstName, u.LastName, u.Patronymic, u.Email, string(hashedPassword), roleId)
 		if err != nil {
 			return fiber.NewError(fiber.StatusConflict, "Ошибка регистрации")
 		}
@@ -143,10 +144,17 @@ func (app *application) GetAvailableListings() fiber.Handler {
 // GetMyListings возвращает объявления текущего пользователя (по email)
 func (app *application) GetMyListings() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		email := c.Query("email")
-		if email == "" {
+		emailEncoded := c.Query("email")
+		if emailEncoded == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "email обязателен")
 		}
+
+		// Декодируем email
+		email, err := url.QueryUnescape(emailEncoded)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат email")
+		}
+
 		user, err := app.users.FindByEmail(email)
 		if err != nil {
 			return fiber.NewError(fiber.StatusNotFound, "Пользователь не найден")
@@ -163,22 +171,30 @@ func (app *application) GetMyListings() fiber.Handler {
 // GetMyBookings возвращает бронирования пользователя с краткой инфой по помещению
 func (app *application) GetMyBookings() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		email := c.Query("email")
-		if email == "" {
+		emailEncoded := c.Query("email")
+		if emailEncoded == "" {
 			return fiber.NewError(fiber.StatusBadRequest, "email обязателен")
 		}
+
+		// Декодируем email
+		email, err := url.QueryUnescape(emailEncoded)
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат email")
+		}
+
 		user, err := app.users.FindByEmail(email)
 		if err != nil {
 			return fiber.NewError(fiber.StatusNotFound, "Пользователь не найден")
 		}
+
 		rows, err := app.listings.DB.Query(`
-			SELECT r.rent_id, r.start_date, r.end_date, r.total_amount::text,
-			       b.building_id, b.name, b.city, b.address
-			FROM rent r
-			JOIN buildings b ON b.building_id = r.building_id
-			WHERE r.user_id = $1
-			ORDER BY r.rent_id DESC
-		`, user.ID)
+            SELECT r.rent_id, r.start_date, r.end_date, r.total_amount::text,
+                   b.building_id, b.name, b.city, b.address
+            FROM rent r
+            JOIN buildings b ON b.building_id = r.building_id
+            WHERE r.user_id = $1
+            ORDER BY r.rent_id DESC
+        `, user.ID)
 		if err != nil {
 			log.Println("Ошибка получения бронирований:", err)
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка получения бронирований")
@@ -189,13 +205,17 @@ func (app *application) GetMyBookings() fiber.Handler {
 		for rows.Next() {
 			var b models.BookingView
 			if err := rows.Scan(&b.ID, &b.StartDate, &b.EndDate, &b.TotalAmount, &b.BuildingID, &b.Type, &b.City, &b.Address); err != nil {
+				log.Println("Ошибка сканирования данных бронирования:", err)
 				return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
 			}
 			list = append(list, b)
 		}
+
 		if err := rows.Err(); err != nil {
+			log.Println("Ошибка итерации по результатам бронирований:", err)
 			return fiber.NewError(fiber.StatusInternalServerError, "Ошибка чтения данных")
 		}
+
 		return c.JSON(list)
 	}
 }

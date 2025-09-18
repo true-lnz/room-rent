@@ -51,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-
         const formData = {
             type: document.getElementById('type').value,
             city: document.getElementById('city').value,
