@@ -21,6 +21,7 @@ func main() {
 	loadEnv()
 
 	engine := html.New("../frontend", ".html")
+	engine.Reload(true)
 
 	// Подключение к базе данных
 	db := Connect()
