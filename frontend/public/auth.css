@@ -1,8 +1,4 @@
 /* Специфичные стили страницы авторизации */
-body { 
-    background-color: #f5f5f5; 
-    padding: 20px; 
-}
 
 .auth-container { 
     max-width: 500px; 

@@ -1,17 +1,24 @@
 /* Общие стили проекта */
 :root { 
-    --primary: #2a5885; 
+    --primary: #305BAB;
     --primary-hover: #426BB9;
     --secondary: #F9FBFF;
     --text-muted: #B0B0B0;
     --text-dark: #424242;
-    --border: #ddd;
+    --border: #dcdcdc;
+    --border-darker: #B0B0B0;
+    --dark: #424242;
+    --darker: #000;
 }
 
-/* Базовые стили */
-* { box-sizing: border-box; }
-body { 
-    margin: 0; 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    margin: 0 16rem;
     font-family: Arial, sans-serif; 
     background-color: var(--secondary);
 }
@@ -19,18 +26,15 @@ body {
 /* Блок: header */
 .header {
     width: 100%;
-    margin: 1rem;
-    padding: 0.75rem 1rem;
-    background: #F9FBFF;
+    margin: 1rem auto;
+    padding: 1rem 1.2rem;
+    background: #ffffff;
     border: 1px solid #dcdcdc;
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: calc(100% - 2rem); /* чтобы учесть отступы */
     box-sizing: border-box;
-    margin-left: auto;
-    margin-right: auto;
 }
 
 .header__container {
@@ -40,22 +44,15 @@ body {
     width: 100%;
 }
 
-/* Блок: logo */
 .logo {
     display: flex;
+    width: 200px;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: #333;
-    text-decoration: none;
 }
 
 .logo__image {
-    width: 200px;
-    background: #333333;
+    width: 100%;
     object-fit: cover;
-    display: inline-block;
 }
 
 .header__btn {
@@ -64,18 +61,19 @@ body {
 
 .nav {
     display: flex;
-    gap: 2rem;          /* ← это расстояние между ссылками */
+    gap: 2rem;          /* это расстояние между ссылками */
     align-items: center;
 }
 .nav__item {
     color: #B0B0B0;
-    text-decoration: none;   /* Убирает подчёркивание */
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: color .3s ease;
 }
 .nav__item:hover {
-    color: #424242;        /* Синий цвет при наведении */
+    color: #424242;
 }
 
-/* Специфичные стили кнопок в хедере */
 .header .btn {
     padding: 0.5rem 1.2rem;
     border-radius: 6px;
@@ -95,8 +93,8 @@ footer {
     position: static;
     width: 100%;
     background-color: var(--secondary);
-    border-top: 1px solid var(--text-muted);
-    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border);
+    padding: 2rem 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -108,22 +106,22 @@ footer {
 
 footer a {
     color: var(--text-muted);
+    transition: color .3s ease;
     text-decoration: none;
 }
 
 footer a:hover {
-    text-decoration: underline;
     color: var(--text-dark);
 }
 
 /* Общие стили кнопок */
 .btn {
     padding: 8px 15px;
-    border-radius: 4px;
+    border-radius: 6px;
     font-size: 14px;
     cursor: pointer;
     text-align: center;
-    transition: all 0.2s;
+    transition: all 0.3s ease;
     text-decoration: none;
     display: inline-block;
     border: none;
@@ -168,7 +166,7 @@ footer a:hover {
     width: 100%;
     padding: 10px;
     border: 1px solid var(--border);
-    border-radius: 4px;
+    border-radius: 6px;
     font-family: Arial, sans-serif;
     font-size: 14px;
 }
@@ -208,7 +206,7 @@ footer a:hover {
     background: #eee; 
     width: 28px; 
     height: 28px;
-    border-radius: 4px; 
+    border-radius: 6px;
     cursor: pointer;
     font-size: 16px;
     display: flex;
@@ -227,21 +225,3 @@ footer a:hover {
     text-align: center;
     font-style: italic;
 }
-
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 15px;
-}
-
-/* Общие стили ссылок */
-a {
-    color: var(--primary);
-    text-decoration: none;
-}
-
-a:hover {
-    text-decoration: underline;
-}
-
-

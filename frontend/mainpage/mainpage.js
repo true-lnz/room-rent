@@ -243,8 +243,10 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     function renderListings(listings) {
         const container = document.getElementById('listings-container');
+        const noresults = document.querySelector('.no-results');
+
         if (!listings || listings.length === 0) {
-            container.innerHTML = '<div class="no-results">Ничего не найдено. Добавьте объявление или измените фильтры.</div>';
+            noresults.style.display = 'block';
             return;
         }
         container.innerHTML = listings.map(listing => {

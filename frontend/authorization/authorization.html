@@ -8,6 +8,8 @@
 </head>
 <body>
 
+{{template "header"}}
+
 <div class="auth-container" id="register-container">
   <h2>Регистрация</h2>
   <div class="form-group">
@@ -58,6 +60,8 @@
   <button class="btn" onclick="login()">Войти</button>
   <div class="toggle" onclick="showRegister()">Нет аккаунта? Зарегистрироваться</div>
 </div>
+
+{{template "footer"}}
 
 <script src="/public/app.js"></script>
 <script src="/public/auth.js"></script>
