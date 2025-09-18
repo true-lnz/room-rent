@@ -40,6 +40,7 @@ func (app *application) Register() fiber.Handler {
 
 		err = app.users.Insert(u.FirstName, u.LastName, u.Patronymic, u.Email, string(hashedPassword), roleId)
 		if err != nil {
+			log.Println(err)
 			return fiber.NewError(fiber.StatusConflict, "Ошибка регистрации")
 		}
 
@@ -60,9 +61,16 @@ func (app *application) Login() fiber.Handler {
 			return fiber.NewError(fiber.StatusUnauthorized, "Неверный логин или пароль")
 		}
 
+		role, err := app.users.GetRoleNameByEmail(creds.Email)
+
+		if err != nil {
+			return fiber.NewError(fiber.StatusBadRequest, "Не найден пользователь")
+		}
+		fmt.Println(role)
 		// Создание JWT-токена
 		token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-			"email": creds.Email,
+			"email": creds.Email, // сюда добавить роль
+			"role":  role,
 			"exp":   time.Now().Add(24 * time.Hour).Unix(),
 		})
 

@@ -48,3 +48,23 @@ func (m *UserModel) FindByEmail(email string) (*User, error) {
 	}
 	return u, nil
 }
+
+func (m *UserModel) GetRoleNameByEmail(email string) (string, error) {
+	// Явно выбираем колонки в ожидаемом порядке
+	stmt := `SELECT r.role_name
+	FROM users u
+	JOIN roles r ON u.role_id = r.id
+	WHERE u.email = $1;`
+	row := m.DB.QueryRow(stmt, email)
+
+	userRoleName := ""
+	err := row.Scan(&userRoleName)
+
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return "", ErrNoRecord
+		}
+		return "", err
+	}
+	return userRoleName, nil
+}

@@ -82,24 +82,26 @@ func main() {
 	})
 
 	// Page routes
-	appFiber.Get("/", func(c *fiber.Ctx) error {
-		return c.Render("mainpage/mainpage", fiber.Map{})
-	})
-	appFiber.Get("/auth", func(c *fiber.Ctx) error {
-		return c.Render("authorization/authorization", fiber.Map{})
-	})
-	appFiber.Get("/add", func(c *fiber.Ctx) error {
-		return c.Render("add_listing/add-listing", fiber.Map{})
-	})
-	appFiber.Get("/personal", func(c *fiber.Ctx) error {
-		return c.Render("personal_acc/personal_acc", fiber.Map{})
-	})
-	appFiber.Get("/my-listings", func(c *fiber.Ctx) error {
-		return c.Render("personal_acc/my_listings", fiber.Map{})
-	})
+	pages := appFiber.Group("")
+	pages.Use(AddRole())
+	pages.Get("/", render("mainpage/mainpage"))
+	pages.Get("/auth", render("authorization/authorization"))
+	pages.Get("/add", render("add_listing/add-listing"))
+	pages.Get("/personal", render("personal_acc/personal_acc"))
+	pages.Get("/my-listings", render("personal_acc/my_listings"))
 
 	port := getEnv("PORT", "8080")
 
 	log.Printf("Сервер запущен на http://localhost:%s", port)
 	log.Fatal(appFiber.Listen(":" + port))
+}
+
+func render(page string) func(c *fiber.Ctx) error {
+	return func(c *fiber.Ctx) error {
+		role := c.Locals("role")
+		if _, ok := role.(string); !ok {
+			return c.Render(page, fiber.Map{"role": ""})
+		}
+		return c.Render(page, fiber.Map{"role": role})
+	}
 }

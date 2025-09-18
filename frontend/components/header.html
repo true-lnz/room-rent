@@ -10,8 +10,11 @@
             <a href="/personal" class="nav__item">Бронирования</a>
             <a href="/my-listings" class="nav__item">Объявления</a>
         </nav>
-
-        <button class="btn btn--primary header__btn">Админ-панель</button>
+        {{if eq .role "admin"}}
+            <button class="btn btn--primary header__btn">Админ-панель</button>
+        {{else}}
+            <button class="btn btn--primary header__btn">ЛК</button>
+        {{end}}
     </div>
 </header>
 {{end}}
