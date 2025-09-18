@@ -9,74 +9,78 @@
 </head>
 <body>
 {{template "header"}}
-    <div class="container">
-        <h1>Мои объявления</h1>
-        <div class="listings" id="listings-container">
+
+<div class="container">
+    <h1>Мои объявления</h1>
+    <div class="listings" id="listings-container">
         <!-- Будет заполнено через JavaScript -->
-        </div>
-
-            <div class="actions">
-                <a href="/add" class="btn btn-primary">Новое объявление</a>
-            </div>
-
-            <div class="footer-nav">
-                <a href="/my-listings" class="nav-btn">Мои объявления</a>
-                <a href="/personal" class="nav-btn">Мои бронирования</a>
-            </div>
-        </div>
     </div>
+
+    <div class="actions">
+        <a href="/add" class="btn btn-primary">Новое объявление</a>
+    </div>
+
+    <div class="footer-nav">
+        <a href="/my-listings" class="nav-btn">Мои объявления</a>
+        <a href="/personal" class="nav-btn">Мои бронирования</a>
+    </div>
+</div>
+</div>
+
 {{template "footer"}}
-<script src="/frontend/personal_acc/my_listings.js"></script>
 
 <!-- Модальное окно редактирования -->
-    <div id="edit-modal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <h2>Редактировать объявление</h2>
-            <form id="edit-form">
-                <div class="form-group">
-                    <label for="edit-type">Тип помещения *</label>
-                    <select id="edit-type" required>
-                        <option value="storage">Кладовка</option>
-                        <option value="office">Офис</option>
-                        <option value="retail">Торговое помещение</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="edit-city">Город *</label>
-                    <input type="text" id="edit-city" required placeholder="Например: Уфа">
-                </div>
-
-                <div class="form-group">
-                    <label for="edit-address">Адрес *</label>
-                    <input type="text" id="edit-address" required placeholder="Улица, дом">
-                </div>
-
-                <div class="form-group">
-                    <label for="edit-price">Цена в месяц *</label>
-                    <input type="number" id="edit-price" required placeholder="10000">
-                </div>
-
-                <div class="edit-actions">
-                    <button type="button" id="delete-listing" class="btn btn-danger">Удалить</button>
-                    <button type="submit" class="btn btn-primary">Сохранить изменения</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    
-    <!-- Модальное окно подтверждения удаления -->
-    <div id="delete-modal" class="modal">
-        <div class="modal-content">
-            <span class="close" id="delete-close">&times;</span>
-            <h2>Удаление объявления</h2>
-            <p>Вы действительно хотите удалить данное объявление? Это действие необратимо.</p>
-            <div class="edit-actions">
-                <button type="button" id="cancel-delete" class="btn btn-secondary">Отмена</button>
-                <button type="button" id="confirm-delete" class="btn btn-danger">Удалить</button>
+<div id="edit-modal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Редактировать объявление</h2>
+        <form id="edit-form">
+            <div class="form-group">
+                <label for="edit-type">Тип помещения *</label>
+                <select id="edit-type" required>
+                    <option value="storage">Кладовка</option>
+                    <option value="office">Офис</option>
+                    <option value="retail">Торговое помещение</option>
+                </select>
             </div>
+
+            <div class="form-group">
+                <label for="edit-city">Город *</label>
+                <input type="text" id="edit-city" required placeholder="Например: Уфа">
+            </div>
+
+            <div class="form-group">
+                <label for="edit-address">Адрес *</label>
+                <input type="text" id="edit-address" required placeholder="Улица, дом">
+            </div>
+
+            <div class="form-group">
+                <label for="edit-price">Цена в месяц *</label>
+                <input type="number" id="edit-price" required placeholder="10000">
+            </div>
+
+            <div class="edit-actions">
+                <button type="button" id="delete-listing" class="btn btn-danger">Удалить</button>
+                <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Модальное окно подтверждения удаления -->
+<div id="delete-modal" class="modal">
+    <div class="modal-content">
+        <span class="close" id="delete-close">&times;</span>
+        <h2>Удаление объявления</h2>
+        <p>Вы действительно хотите удалить данное объявление? Это действие необратимо.</p>
+        <div class="edit-actions">
+            <button type="button" id="cancel-delete" class="btn btn-secondary">Отмена</button>
+            <button type="button" id="confirm-delete" class="btn btn-danger">Удалить</button>
         </div>
     </div>
+</div>
+
+<script src="/frontend/personal_acc/my_listings.js"></script>
+
 </body>
 </html>

@@ -9,86 +9,90 @@
 </head>
 <body>
 {{template "header"}}
+
 <!-- Заголовок фильтров -->
-    <h1 class="filters-title">Фильтры</h1>
-    <!-- Фильтры -->
-    <div class="filters">
-        <div class="filter" id="price-filter">
-            <button class="filter-btn">Цена</button>
-            <div class="dropdown">
-                <label for="price-min">От:</label>
-                <input type="number" id="price-min" placeholder="0" min="0">
-                <label for="price-max">До:</label>
-                <input type="number" id="price-max" placeholder="100000" min="0">
-                <button class="btn" onclick="applyFilters()">Применить</button>
-            </div>
+<h1 class="filters-title">Фильтры</h1>
+<!-- Фильтры -->
+<div class="filters">
+    <div class="filter" id="price-filter">
+        <button class="filter-btn">Цена</button>
+        <div class="dropdown">
+            <label for="price-min">От:</label>
+            <input type="number" id="price-min" placeholder="0" min="0">
+            <label for="price-max">До:</label>
+            <input type="number" id="price-max" placeholder="100000" min="0">
+            <button class="btn" onclick="applyFilters()">Применить</button>
         </div>
-        
-        <div class="filter" id="type-filter">
-            <button class="filter-btn">Тип</button>
-            <div class="dropdown">
-                <select id="type">
-                    <option value="">Все типы</option>
-                    <option value="storage">Кладовка</option>
-                    <option value="office">Офис</option>
-                    <option value="retail">Торговое помещение</option>
-                </select>
-                <button class="btn" onclick="applyFilters()">Применить</button>
-            </div>
-        </div>
-        
-        <div class="filter" id="city-filter">
-            <button class="filter-btn">Город</button>
-            <div class="dropdown">
-                <select id="city">
-                    <option value="">Все города</option>
-                    <option value="ufa">Уфа</option>
-                    <option value="moscow">Москва</option>
-                    <option value="spb">Санкт-Петербург</option>
-                </select>
-                <button class="btn" onclick="applyFilters()">Применить</button>
-            </div>
-        </div>
-        
-        <div class="filter" id="date-filter">
-            <button class="filter-btn">Дата</button>
-            <div class="dropdown">
-                <label for="date-from">С:</label>
-                <input type="date" id="date-from">
-                <label for="date-to">По:</label>
-                <input type="date" id="date-to">
-                <button class="btn" onclick="applyFilters()">Применить</button>
-            </div>
-        </div>
-    </div>
-    <button class="btn btn-secondary" id="reset-filters" style="margin: 0 15px 20px;">Очистить фильтры</button>
-    
-    <!-- Список объявлений -->
-    <div class="listings" id="listings-container">
-        <!-- Будет заполнено через JavaScript -->
     </div>
 
-
-    <!-- Модальное окно -->
-    <div class="modal" id="modal">
-        <div class="modal-content">
-            <button class="close-btn">&times;</button>
-            <h2 class="modal-title"></h2>
-            <p class="modal-price"></p>
-            <p class="modal-city"></p>
-            <p class="modal-address"></p>
-            <p><strong>Описание:</strong> <span class="modal-description"></span></p>
-            <p><strong>Комментарий:</strong> <span class="modal-comment"></span></p>
-            <img class="modal-image" src="" alt="Фото помещения" style="width: 100%; height: 180px; object-fit: cover; margin: 10px 0;">
-            <form class="booking-form">
-                <label>Выберите даты аренды:</label>
-                <input type="date" id="start-date" required>
-                <input type="date" id="end-date" required>
-                <button type="submit" class="btn btn-primary">Забронировать</button>
-            </form>
+    <div class="filter" id="type-filter">
+        <button class="filter-btn">Тип</button>
+        <div class="dropdown">
+            <select id="type">
+                <option value="">Все типы</option>
+                <option value="storage">Кладовка</option>
+                <option value="office">Офис</option>
+                <option value="retail">Торговое помещение</option>
+            </select>
+            <button class="btn" onclick="applyFilters()">Применить</button>
         </div>
     </div>
+
+    <div class="filter" id="city-filter">
+        <button class="filter-btn">Город</button>
+        <div class="dropdown">
+            <select id="city">
+                <option value="">Все города</option>
+                <option value="ufa">Уфа</option>
+                <option value="moscow">Москва</option>
+                <option value="spb">Санкт-Петербург</option>
+            </select>
+            <button class="btn" onclick="applyFilters()">Применить</button>
+        </div>
+    </div>
+
+    <div class="filter" id="date-filter">
+        <button class="filter-btn">Дата</button>
+        <div class="dropdown">
+            <label for="date-from">С:</label>
+            <input type="date" id="date-from">
+            <label for="date-to">По:</label>
+            <input type="date" id="date-to">
+            <button class="btn" onclick="applyFilters()">Применить</button>
+        </div>
+    </div>
+</div>
+<button class="btn btn-secondary" id="reset-filters" style="margin: 0 15px 20px;">Очистить фильтры</button>
+
+<!-- Список объявлений -->
+<div class="listings" id="listings-container">
+    <!-- Будет заполнено через JavaScript -->
+</div>
+
+
+<!-- Модальное окно -->
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <button class="close-btn">&times;</button>
+        <h2 class="modal-title"></h2>
+        <p class="modal-price"></p>
+        <p class="modal-city"></p>
+        <p class="modal-address"></p>
+        <p><strong>Описание:</strong> <span class="modal-description"></span></p>
+        <p><strong>Комментарий:</strong> <span class="modal-comment"></span></p>
+        <img class="modal-image" src="" alt="Фото помещения"
+             style="width: 100%; height: 180px; object-fit: cover; margin: 10px 0;">
+        <form class="booking-form">
+            <label>Выберите даты аренды:</label>
+            <input type="date" id="start-date" required>
+            <input type="date" id="end-date" required>
+            <button type="submit" class="btn btn-primary">Забронировать</button>
+        </form>
+    </div>
+</div>
+
 {{template "footer"}}
+
 <script src="mainpage.js"></script>
 </body>
 </html>

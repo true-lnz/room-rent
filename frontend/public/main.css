@@ -52,10 +52,12 @@ body {
 }
 
 .logo__image {
-    width: 240px;
-    height: 55px;
+    width: 200px;
+    background: #333333;
+    object-fit: cover;
     display: inline-block;
 }
+
 .header__btn {
     margin-left: auto;   /* кнопка вправо */
 }
