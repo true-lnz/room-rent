@@ -81,23 +81,33 @@
 
 {{template "footer"}}
 
-<div class="modal" id="modal">
+<div class="modal modal-main" id="modal">
     <div class="modal-content">
-        <button class="close-btn">&times;</button>
-        <h2 class="modal-title"></h2>
-        <p class="modal-price"></p>
-        <p class="modal-city"></p>
-        <p class="modal-address"></p>
-        <p><strong>Описание:</strong> <span class="modal-description"></span></p>
-        <p><strong>Комментарий:</strong> <span class="modal-comment"></span></p>
-        <img class="modal-image" src="" alt="Фото помещения"
-             style="width: 100%; height: 180px; object-fit: cover; margin: 10px 0;">
-        <form class="booking-form">
-            <label>Выберите даты аренды:</label>
-            <input type="date" id="start-date" required>
-            <input type="date" id="end-date" required>
-            <button type="submit" class="btn btn-primary">Забронировать</button>
-        </form>
+        <div class="modal-header">
+            <h2 class="modal-title"></h2>
+            <button class="close-btn">&times;</button>
+        </div>
+        <div class="image-container">
+            <img class="modal-image" src="" alt="Фото помещения">
+        </div>
+        <div class="modal-info">
+            <label>Описание помещения</label>
+            <p class="modal-price"></p>
+            <p class="modal-address"></p>
+            <p> <span class="modal-description"></span></p>
+        </div>
+        <div class="booking-form-container">
+            <form class="booking-form">
+                <label>Выберите даты:</label>
+                <div class="date-inputs">
+                    <input type="date" id="start-date" required>
+                    <input type="date" id="end-date" required>
+                </div>
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">Забронировать</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 

@@ -1,5 +1,4 @@
-/* Общие стили проекта */
-:root { 
+:root {
     --primary: #305BAB;
     --primary-hover: #426BB9;
     --secondary: #F9FBFF;
@@ -37,7 +36,7 @@ body {
     flex: 1 0 auto;
     width: 100%;
 }
-/* Блок: header */
+
 .header {
     width: 100%;
     margin: 1rem auto;

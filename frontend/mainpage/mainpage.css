@@ -10,7 +10,6 @@
     background: #ffffff;
 }
 
-/* Фильтры */
 .filters__container {
     display: flex;
     flex-direction: column;
@@ -193,7 +192,6 @@
     background: var(--dark);
 }
 
-/* Кнопка сброса фильтров */
 #reset-filters {
     color: var(--darker);
     background: #ffffff;
@@ -202,4 +200,101 @@
 
 #reset-filters:hover {
     background-color: #e7e7e7;
+}
+
+.modal-main .modal-content {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1.5rem;
+    border-radius: 8px;
+    max-width: 600px;
+    margin: 0 auto;
+    background: white;
+    border: 1px solid var(--border);
+}
+
+.modal-main .modal-content > * {
+    flex-grow: 1;
+}
+
+.modal-main .booking-form-container {
+    flex-basis: 100%;
+}
+
+/* Форма — flex, кнопки справа */
+.modal-main .booking-form {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.modal-main .booking-form > label {
+    flex-basis: auto;
+    margin-bottom: 0;
+    color: #B0B0B0;
+}
+
+.modal-main .date-inputs {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-grow: 1;
+}
+
+.modal-main .form-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+}
+
+/* Картинка в контейнере */
+.modal-main .image-container img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 4px;
+}
+
+/* Заголовок и кнопка в шапке */
+.modal-main .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    flex-basis: 100%;
+}
+
+.modal-main .close-btn {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #888;
+}
+
+.modal-main .close-btn:hover {
+    color: var(--dark);
+}
+
+.modal-main .modal-price {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #000000;
+    margin: 0.5rem 0;
+}
+.modal-main .modal-address {
+    font-size: 1rem;
+    color: #000000;
+    margin: 0;
+}
+.modal-main .modal-description {
+    font-size: 0.9rem;
+    font-weight: normal;
+    color: #000000;
+    margin: 0.5rem 0;
+}
+label {
+    color: #B0B0B0;
 }
