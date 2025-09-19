@@ -28,34 +28,6 @@ function translateType(code) {
     return map[code] || code;
 }
 
-// Функция для проверки авторизации
-function checkAuth() {
-    const token = localStorage.getItem('token');
-    if (!token) {
-        window.location.href = '/auth';
-        return null;
-    }
-
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.email;
-    } catch (e) {
-        localStorage.removeItem('token');
-        window.location.href = '/auth';
-        return null;
-    }
-}
-
-// Функция для проверки размера файла
-function validateFileSize(file, maxSizeMB = 10) {
-    const maxSize = maxSizeMB * 1024 * 1024;
-    if (file.size > maxSize) {
-        alert(`Файл больше ${maxSizeMB} МБ, выберите другой.`);
-        return false;
-    }
-    return true;
-}
-
 function renderListings(listings) {
     const container = document.getElementById('listings-container');
     if (!listings || listings.length === 0) {
@@ -85,8 +57,13 @@ function renderListings(listings) {
     }).join('');
 }
 
+// --- ДОБАВЛЕНИЕ НОВОГО ОБЪЯВЛЕНИЯ ---
 
-// --- ФУНКЦИИ ДЛЯ МОДАЛЬНОГО ОКНА ДОБАВЛЕНИЯ ---
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    if (!token) { window.location.href = '/auth'; return null; }
+    try { return JSON.parse(atob(token.split('.')[1])).email; } catch (_) { localStorage.removeItem('token'); window.location.href = '/auth'; return null; }
+}
 
 function openAddModal() {
     document.getElementById('add-modal').style.display = 'block';
@@ -96,175 +73,83 @@ function openAddModal() {
 function closeAddModal() {
     document.getElementById('add-modal').style.display = 'none';
     document.body.style.overflow = '';
-    document.getElementById('add-form').reset();
-    // Сбрасываем изображение на placeholder
-    document.getElementById('preview-image').src = 'download-icon.png';
+    document.getElementById('add-form')?.reset();
+    const preview = document.getElementById('preview-image');
+    if (preview) preview.src = 'download-icon.png';
+}
+
+async function reloadListings() {
+    listingsData = await loadMyListings();
+    renderListings(listingsData);
 }
 
 function setupAddModal() {
     const addModal = document.getElementById('add-modal');
-    const openAddModalBtn = document.getElementById('open-add-modal');
-    const closeAddModalBtn = document.getElementById('close-add-modal');
-    const cancelAddBtn = document.getElementById('cancel-add');
+    const openBtn = document.getElementById('open-add-modal');
+    const closeBtn = document.getElementById('close-add-modal');
+    const cancelBtn = document.getElementById('cancel-add');
     const addForm = document.getElementById('add-form');
-    const imageUploadInput = document.getElementById('image-upload');
-    const previewImage = document.getElementById('preview-image');
+    const imageInput = document.getElementById('image-upload');
+    const preview = document.getElementById('preview-image');
 
-    // Проверяем авторизацию при открытии модального окна
-    openAddModalBtn.addEventListener('click', function() {
-        const userEmail = checkAuth();
-        if (!userEmail) return;
-        openAddModal();
-    });
+    if (openBtn) openBtn.addEventListener('click', () => { if (checkAuth()) openAddModal(); });
+    if (closeBtn) closeBtn.addEventListener('click', closeAddModal);
+    if (cancelBtn) cancelBtn.addEventListener('click', closeAddModal);
+    window.addEventListener('click', (e) => { if (e.target === addModal) closeAddModal(); });
 
-    // Закрытие модального окна
-    closeAddModalBtn.addEventListener('click', closeAddModal);
-    cancelAddBtn.addEventListener('click', closeAddModal);
+    if (imageInput && preview) {
+        preview.addEventListener('click', () => imageInput.click());
+        imageInput.addEventListener('change', function() {
+            const file = this.files && this.files[0];
+            if (!file) return;
+            const r = new FileReader();
+            r.onload = (ev) => { preview.src = ev.target.result; };
+            r.readAsDataURL(file);
+        });
+    }
 
-    // Закрытие по клику вне модального окна
-    window.addEventListener('click', function(event) {
-        if (event.target === addModal) {
-            closeAddModal();
-        }
-    });
+    if (addForm) {
+        addForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const userEmail = checkAuth();
+            if (!userEmail) return;
 
-    // Обработка загрузки изображения
-    imageUploadInput.addEventListener('change', function() {
-        const file = this.files[0];
-        if (file) {
-            if (!validateFileSize(file)) {
-                this.value = ''; // Очищаем input
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                previewImage.src = e.target.result;
+            const formData = {
+                type: document.getElementById('add-type').value,
+                city: document.getElementById('add-city').value,
+                address: document.getElementById('add-address').value,
+                price: document.getElementById('add-price').value,
+                description: (document.getElementById('add-description').value || '').trim(),
+                user_comment: (document.getElementById('add-user_comment').value || '').trim(),
+                user_email: userEmail
             };
-            reader.readAsDataURL(file);
-        }
-    });
 
-    // Клик по изображению = открыть выбор файла
-    previewImage.addEventListener('click', () => {
-        imageUploadInput.click();
-    });
-
-    // Обработка отправки формы
-    addForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-
-        // Проверяем авторизацию
-        const userEmail = checkAuth();
-        if (!userEmail) return;
-
-        // Валидация формы
-        if (!addForm.checkValidity()) {
-            e.stopPropagation();
-            addForm.classList.add('was-validated');
-            return;
-        }
-
-        // Сбор данных формы
-        const formData = {
-            type: document.getElementById('add-type').value,
-            city: document.getElementById('add-city').value,
-            address: document.getElementById('add-address').value,
-            price: document.getElementById('add-price').value,
-            description: (document.getElementById('add-description').value || '').trim(),
-            user_comment: (document.getElementById('add-user_comment').value || '').trim(),
-            user_email: userEmail
-        };
-
-        const imageInput = document.getElementById('image-upload');
-        const file = imageInput.files[0];
-
-        try {
-            // 1) Создаем объявление
-            const response = await fetch('/api/add-listing', {
+            const resp = await fetch('/api/add-listing', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`
-                },
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
                 credentials: 'include',
                 body: JSON.stringify(formData)
             });
+            if (!resp.ok) { alert('Ошибка создания: ' + (await resp.text())); return; }
+            const { id } = await resp.json().catch(async () => ({ id: 0 }));
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                alert('❌ Ошибка создания: ' + errorText);
-                return;
-            }
-
-            let created = {};
-            try {
-                created = await response.json();
-            } catch (_) {
-                const raw = await response.text();
-                alert('❌ Ошибка парсинга ответа: ' + raw);
-                return;
-            }
-
-            const listingId = created?.id;
-
-            // 2) Загружаем изображение, если есть
-            if (listingId && file) {
-                if (!validateFileSize(file)) return;
-
+            const file = imageInput && imageInput.files ? imageInput.files[0] : null;
+            if (id && file) {
                 const fd = new FormData();
                 fd.append('image', file);
-
-                const uploadResp = await fetch(`/api/listings/${listingId}/images`, {
+                await fetch(`/api/listings/${id}/images`, {
                     method: 'POST',
                     body: fd,
                     credentials: 'include',
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
+                    headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
                 });
-
-                if (!uploadResp.ok) {
-                    const uploadError = await uploadResp.text();
-                    alert('Объявление создано, но загрузка фото не удалась: ' + uploadError);
-                }
             }
-
-            // Успешное завершение
             closeAddModal();
             await reloadListings();
-            alert('✅ Объявление успешно добавлено!');
-
-        } catch (error) {
-            console.error('Ошибка отправки:', error);
-            alert('❌ Ошибка сети. Попробуйте ещё раз.');
-        }
-    });
+            alert('Объявление добавлено');
+        });
+    }
 }
-
-// Функция для перезагрузки объявлений
-async function reloadListings() {
-    listingsData = await loadMyListings();
-
-    // Загрузка изображений
-    try {
-        await Promise.all((listingsData || []).map(async (l) => {
-            try {
-                const r = await fetch(`/api/listings/${l.id}/images`);
-                if (r.ok) {
-                    const imgs = await r.json();
-                    if (Array.isArray(imgs) && imgs.length > 0 && imgs[0].file_path) {
-                        imagesMap[l.id] = imgs[0].file_path;
-                    }
-                }
-            } catch (_) {}
-        }));
-    } catch (_) {}
-
-    renderListings(listingsData);
-}
-
-
-// --- МОДАЛКИ И ПРОЧЕЕ ОСТАВЛЯЕМ БЕЗ ИЗМЕНЕНИЙ ---
 
 let listingsData = [];
 let imagesMap = {};
@@ -409,4 +294,5 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.querySelector('#edit-modal .close')?.addEventListener('click', closeEditModal);
     window.addEventListener('click', (e) => { const modal = document.getElementById('edit-modal'); if (e.target === modal) closeEditModal(); });
     setupEditForm();
+    setupAddModal();
 });
