@@ -14,7 +14,7 @@ async function loadMyListings() {
         return [];
     }
     try {
-        const res = await fetch(`/api/my-listings?email=${encodeURIComponent(email)}`);
+        const res = await fetch(`/api/my-listings?email=${email}`);
         if (!res.ok) throw new Error(await res.text());
         return await res.json();
     } catch (e) {

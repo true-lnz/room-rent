@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -157,11 +156,8 @@ func (app *application) GetMyListings() fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, "email обязателен")
 		}
 
-		// Декодируем email
-		email, err := url.QueryUnescape(emailEncoded)
-		if err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат email")
-		}
+		// Не декодируем повторно: фронт уже шлёт обычный email
+		email := emailEncoded
 
 		user, err := app.users.FindByEmail(email)
 		if err != nil {
@@ -184,11 +180,8 @@ func (app *application) GetMyBookings() fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, "email обязателен")
 		}
 
-		// Декодируем email
-		email, err := url.QueryUnescape(emailEncoded)
-		if err != nil {
-			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат email")
-		}
+		// Не декодируем повторно
+		email := emailEncoded
 
 		user, err := app.users.FindByEmail(email)
 		if err != nil {
