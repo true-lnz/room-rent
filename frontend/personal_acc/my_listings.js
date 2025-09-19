@@ -28,6 +28,34 @@ function translateType(code) {
     return map[code] || code;
 }
 
+// Функция для проверки авторизации
+function checkAuth() {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = '/auth';
+        return null;
+    }
+
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.email;
+    } catch (e) {
+        localStorage.removeItem('token');
+        window.location.href = '/auth';
+        return null;
+    }
+}
+
+// Функция для проверки размера файла
+function validateFileSize(file, maxSizeMB = 10) {
+    const maxSize = maxSizeMB * 1024 * 1024;
+    if (file.size > maxSize) {
+        alert(`Файл больше ${maxSizeMB} МБ, выберите другой.`);
+        return false;
+    }
+    return true;
+}
+
 function renderListings(listings) {
     const container = document.getElementById('listings-container');
     if (!listings || listings.length === 0) {
@@ -56,6 +84,185 @@ function renderListings(listings) {
         </div>`;
     }).join('');
 }
+
+
+// --- ФУНКЦИИ ДЛЯ МОДАЛЬНОГО ОКНА ДОБАВЛЕНИЯ ---
+
+function openAddModal() {
+    document.getElementById('add-modal').style.display = 'block';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeAddModal() {
+    document.getElementById('add-modal').style.display = 'none';
+    document.body.style.overflow = '';
+    document.getElementById('add-form').reset();
+    // Сбрасываем изображение на placeholder
+    document.getElementById('preview-image').src = 'download-icon.png';
+}
+
+function setupAddModal() {
+    const addModal = document.getElementById('add-modal');
+    const openAddModalBtn = document.getElementById('open-add-modal');
+    const closeAddModalBtn = document.getElementById('close-add-modal');
+    const cancelAddBtn = document.getElementById('cancel-add');
+    const addForm = document.getElementById('add-form');
+    const imageUploadInput = document.getElementById('image-upload');
+    const previewImage = document.getElementById('preview-image');
+
+    // Проверяем авторизацию при открытии модального окна
+    openAddModalBtn.addEventListener('click', function() {
+        const userEmail = checkAuth();
+        if (!userEmail) return;
+        openAddModal();
+    });
+
+    // Закрытие модального окна
+    closeAddModalBtn.addEventListener('click', closeAddModal);
+    cancelAddBtn.addEventListener('click', closeAddModal);
+
+    // Закрытие по клику вне модального окна
+    window.addEventListener('click', function(event) {
+        if (event.target === addModal) {
+            closeAddModal();
+        }
+    });
+
+    // Обработка загрузки изображения
+    imageUploadInput.addEventListener('change', function() {
+        const file = this.files[0];
+        if (file) {
+            if (!validateFileSize(file)) {
+                this.value = ''; // Очищаем input
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImage.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Клик по изображению = открыть выбор файла
+    previewImage.addEventListener('click', () => {
+        imageUploadInput.click();
+    });
+
+    // Обработка отправки формы
+    addForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Проверяем авторизацию
+        const userEmail = checkAuth();
+        if (!userEmail) return;
+
+        // Валидация формы
+        if (!addForm.checkValidity()) {
+            e.stopPropagation();
+            addForm.classList.add('was-validated');
+            return;
+        }
+
+        // Сбор данных формы
+        const formData = {
+            type: document.getElementById('add-type').value,
+            city: document.getElementById('add-city').value,
+            address: document.getElementById('add-address').value,
+            price: document.getElementById('add-price').value,
+            description: (document.getElementById('add-description').value || '').trim(),
+            user_comment: (document.getElementById('add-user_comment').value || '').trim(),
+            user_email: userEmail
+        };
+
+        const imageInput = document.getElementById('image-upload');
+        const file = imageInput.files[0];
+
+        try {
+            // 1) Создаем объявление
+            const response = await fetch('/api/add-listing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`
+                },
+                credentials: 'include',
+                body: JSON.stringify(formData)
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                alert('❌ Ошибка создания: ' + errorText);
+                return;
+            }
+
+            let created = {};
+            try {
+                created = await response.json();
+            } catch (_) {
+                const raw = await response.text();
+                alert('❌ Ошибка парсинга ответа: ' + raw);
+                return;
+            }
+
+            const listingId = created?.id;
+
+            // 2) Загружаем изображение, если есть
+            if (listingId && file) {
+                if (!validateFileSize(file)) return;
+
+                const fd = new FormData();
+                fd.append('image', file);
+
+                const uploadResp = await fetch(`/api/listings/${listingId}/images`, {
+                    method: 'POST',
+                    body: fd,
+                    credentials: 'include',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+
+                if (!uploadResp.ok) {
+                    const uploadError = await uploadResp.text();
+                    alert('Объявление создано, но загрузка фото не удалась: ' + uploadError);
+                }
+            }
+
+            // Успешное завершение
+            closeAddModal();
+            await reloadListings();
+            alert('✅ Объявление успешно добавлено!');
+
+        } catch (error) {
+            console.error('Ошибка отправки:', error);
+            alert('❌ Ошибка сети. Попробуйте ещё раз.');
+        }
+    });
+}
+
+// Функция для перезагрузки объявлений
+async function reloadListings() {
+    listingsData = await loadMyListings();
+
+    // Загрузка изображений
+    try {
+        await Promise.all((listingsData || []).map(async (l) => {
+            try {
+                const r = await fetch(`/api/listings/${l.id}/images`);
+                if (r.ok) {
+                    const imgs = await r.json();
+                    if (Array.isArray(imgs) && imgs.length > 0 && imgs[0].file_path) {
+                        imagesMap[l.id] = imgs[0].file_path;
+                    }
+                }
+            } catch (_) {}
+        }));
+    } catch (_) {}
+
+    renderListings(listingsData);
+}
+
 
 // --- МОДАЛКИ И ПРОЧЕЕ ОСТАВЛЯЕМ БЕЗ ИЗМЕНЕНИЙ ---
 

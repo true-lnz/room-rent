@@ -23,6 +23,20 @@ body {
     background-color: var(--secondary);
 }
 
+html, body {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1 0 auto;
+    width: 100%;
+}
 /* Блок: header */
 .header {
     width: 100%;
@@ -102,6 +116,7 @@ footer {
     color: var(--text-muted);
     font-size: 0.9rem;
     margin-top: 24px;
+    flex-shrink: 0;
 }
 
 footer a {
