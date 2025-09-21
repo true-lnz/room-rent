@@ -5,16 +5,34 @@
             <img src="frontend/public/logo.png" alt="СвойКвадрат" class="logo__image" />
         </a>
 
-        <nav class="nav">
-            <a href="/" class="nav__item">Главная</a>
-            <a href="/personal" class="nav__item">Бронирования</a>
-            <a href="/my-listings" class="nav__item">Объявления</a>
-        </nav>
         {{if eq .role "admin"}}
-            <button class="btn btn--primary header__btn">Админ-панель</button>
+            <nav class="nav">
+                <a href="/" class="nav__item">Главная</a>
+                <a href="/" class="nav__item">Все бронирования</a>
+                <a href="/" class="nav__item">Все объявления</a>
+            </nav>
+            <button class="btn btn--primary header__btn" id="admin-btn">Админ-панель</button>
+        {{else if eq .role ""}}
+            <nav class="nav">
+                <a href="/" class="nav__item">Главная</a>
+                <a href="/#how-it-work" class="nav__item">Как работает?</a>
+                <a href="/#faq" class="nav__item">Вопросы и ответы</a>
+                <a href="/#footer" class="nav__item">Контакты</a>
+            </nav>
+            <div class="slider__buttons">
+                <button class="btn slider__btn">Войти</button>
+                <button class="btn slider__btn active">Регистрация</button>
+            </div>
         {{else}}
-            <button class="btn btn--primary header__btn">ЛК</button>
+            <nav class="nav">
+                <a href="/" class="nav__item">Главная</a>
+                <a href="/personal" class="nav__item">Мои бронирования</a>
+                <a href="/my-listings" class="nav__item">Мои объявления</a>
+                <a href="/#footer" class="nav__item">Контакты</a>
+            </nav>
+            <button class="btn btn--primary header__btn" id="lk-btn">Личный кабинет</button>
         {{end}}
+
     </div>
 </header>
 {{end}}
