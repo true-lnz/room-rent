@@ -58,3 +58,24 @@ async function login(){
 }
 
 
+// Показ нужного блока по хэшу URL при загрузке страницы
+function updateAuthViewFromHash(){
+  const hash = (window.location.hash || '').toLowerCase();
+  if(hash === '#login'){
+    showLogin();
+  }else if(hash === '#register'){
+    showRegister();
+  }else{
+    // Если хэша нет — оставляем как по макету (регистрация)
+    showRegister();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  // Явно устанавливаем исходное состояние по хэшу
+  updateAuthViewFromHash();
+});
+
+// Поддержка переключения вкладок при смене хэша на этой же странице
+window.addEventListener('hashchange', updateAuthViewFromHash);
+
