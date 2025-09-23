@@ -119,7 +119,8 @@ func (app *application) GetAvailableListings() fiber.Handler {
 			return fiber.NewError(fiber.StatusBadRequest, "Неверный формат даты to")
 		}
 		rows, err := app.listings.DB.Query(`
-			SELECT b.building_id, b.name, b.city, b.address, b.cost_per_day::text, b.comment, b.user_id
+            SELECT b.building_id, b.name, b.city, b.address, b.cost_per_day::text,
+                   COALESCE(b.description, '') AS comment, b.user_id
 			FROM buildings b
 			WHERE NOT EXISTS (
 				SELECT 1 FROM rent r

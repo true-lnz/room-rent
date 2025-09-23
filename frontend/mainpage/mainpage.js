@@ -68,7 +68,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     const getTypeName = (code) => ({
         storage: 'Кладовка',
         office: 'Офис',
-        retail: 'Торговое помещение',
         warehouse: 'Склад',
         garage: 'Гараж'
     }[code] || code);
@@ -85,6 +84,16 @@ document.addEventListener('DOMContentLoaded', async function() {
         if (v === 'москва') return 'moscow';
         if (v.includes('петербург') || v === 'спб') return 'spb';
         return v;
+    };
+
+    const normalizeTypeCode = (val) => {
+        const v = (val || '').toString().toLowerCase();
+        if (v.includes('кладов')) return 'storage';
+        if (v === 'office' || v.includes('офис')) return 'office';
+        // retail отсутствует в системе
+        if (v.includes('склад')) return 'warehouse';
+        if (v.includes('гараж')) return 'garage';
+        return v; // если уже код
     };
 
     // Инициализация
@@ -166,43 +175,39 @@ document.addEventListener('DOMContentLoaded', async function() {
     async function applyFilters() {
         const priceMin = parseInt(document.getElementById('price-min').value) || 0;
         const priceMax = parseInt(document.getElementById('price-max').value) || 999999;
-        const type = document.getElementById('type').value; // code or ''
-        const city = document.getElementById('city').value; // code or ''
-        const dateFrom = document.getElementById('date-from')?.value || '';
-        const dateTo = document.getElementById('date-to')?.value || '';
+        const type = (document.getElementById('type').value || '').trim();
+        const city = (document.getElementById('city').value || '').trim();
+        const dateFrom = (document.getElementById('date-from')?.value || '').trim();
+        const dateTo = (document.getElementById('date-to')?.value || '').trim();
 
-        let filtered = listingsData.filter(listing => {
+        const baseMatch = (listing) => {
             const priceNum = parseInt(listing.price) || 0;
             const priceOk = priceNum >= priceMin && priceNum <= priceMax;
-            const typeOk = !type || listing.type === type;
+            const listingTypeCode = normalizeTypeCode(listing.type || listing.name || '');
+            const typeOk = !type || listingTypeCode === type;
             const cityOk = !city || normalizeCityCode(listing.city) === city;
-            let dateOk = true;
-            if (dateFrom) dateOk = dateOk && (listing.date ? listing.date >= dateFrom : true);
-            if (dateTo) dateOk = dateOk && (listing.date ? listing.date <= dateTo : true);
-            return priceOk && typeOk && cityOk && dateOk;
-        });
+            return priceOk && typeOk && cityOk;
+        };
 
+        let result = [];
         if (dateFrom && dateTo) {
             try {
                 const res = await fetch(`/api/listings/available?from=${dateFrom}&to=${dateTo}`);
                 if (res.ok) {
                     const availableListings = await res.json();
-                    filtered = availableListings.filter(listing => {
-                        const priceNum = parseInt(listing.price) || 0;
-                        const priceOk = priceNum >= priceMin && priceNum <= priceMax;
-                        const typeOk = !type || listing.type === type;
-                        const cityOk = !city || normalizeCityCode(listing.city) === city;
-                        return priceOk && typeOk && cityOk;
-                    });
+                    result = (availableListings || []).filter(baseMatch);
                 } else {
-                    //
+                    result = [];
                 }
-            } catch (e) {
-                //
+            } catch (_) {
+                result = [];
             }
+        } else {
+            // Без дат фильтруем локально
+            result = listingsData.filter(baseMatch);
         }
 
-        renderListings(filtered);
+        renderListings(result);
         document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
     }
     window.applyFilters = applyFilters;
@@ -215,6 +220,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         document.getElementById('date-from').value = '';
         document.getElementById('date-to').value = '';
         renderListings(listingsData);
+        document.querySelectorAll('.filter').forEach(f => f.classList.remove('active'));
     });
 
     function openModalFor(listing) {
