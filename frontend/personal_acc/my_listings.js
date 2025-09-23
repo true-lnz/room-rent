@@ -124,6 +124,13 @@ function setupAddModal() {
                 user_email: userEmail
             };
 
+            // Валидация описания: 10..100 символов
+            const descLen = formData.description.length;
+            if (descLen < 10 || descLen > 100) {
+                alert('Описание обязательно. Длина должна быть от 10 до 100 символов.');
+                return;
+            }
+
             const resp = await fetch('/api/add-listing', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },

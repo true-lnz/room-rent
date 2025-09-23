@@ -353,6 +353,12 @@ func (app *application) SaveListingPost(c *fiber.Ctx) error {
 		return fiber.NewError(fiber.StatusBadRequest, "Ошибка парсинга данных")
 	}
 
+	// Серверная валидация описания: 10..100 символов
+	desc := strings.TrimSpace(listingReq.Description)
+	if l := len([]rune(desc)); l < 10 || l > 100 {
+		return fiber.NewError(fiber.StatusBadRequest, "Описание обязательно и должно быть от 10 до 100 символов")
+	}
+
 	// Получаем user_id по email
 	user, err := app.users.FindByEmail(listingReq.UserEmail)
 	if err != nil {
@@ -366,7 +372,7 @@ func (app *application) SaveListingPost(c *fiber.Ctx) error {
 		City:        listingReq.City,
 		Address:     listingReq.Address,
 		Price:       listingReq.Price,
-		Description: listingReq.Description,
+		Description: desc,
 		UserComment: listingReq.UserComment,
 		UserID:      user.ID,
 	}
