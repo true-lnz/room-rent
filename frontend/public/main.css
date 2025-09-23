@@ -102,6 +102,26 @@ body {
     background-color: var(--primary-hover);
 }
 
+.slider__buttons {
+    margin-left: auto;
+    background: var(--primary);
+    border-radius: 8px;
+    border: 2px solid var(--primary);
+}
+
+.slider__buttons .slider__btn {
+    padding: 6px 8px;
+    color: #ffffff;
+}
+
+.slider__buttons .slider__btn.active {
+    background: #ffffff;
+    margin: 1px;
+    border-radius: 5px;
+    color: var(--primary);
+    font-weight: 600;
+}
+
 footer {
     position: static;
     width: 100%;
