@@ -109,3 +109,37 @@ button:hover {
     text-decoration: none;
     color: #333;
 }
+
+/* --- Модалка просмотра объявления --- */
+#view-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,.5);
+    display: none; /* включаем flex в JS */
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    z-index: 1000;
+}
+
+#view-modal .modal-content {
+    background: #fff;
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh; /* ограничиваем высоту окна */
+    overflow: auto;   /* скроллим содержимое внутри */
+    border-radius: 8px;
+    padding: 20px;
+}
+
+#view-modal .modal-body img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+#view-modal .close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}

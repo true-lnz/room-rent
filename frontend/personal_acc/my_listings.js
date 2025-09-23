@@ -2,7 +2,7 @@
 async function loadMyListings() {
     const token = localStorage.getItem('token');
     if (!token) {
-        window.location.href = '/frontend/authorization/authorization.html';
+        window.location.href = '/auth';
         return [];
     }
     let email = '';
@@ -10,7 +10,7 @@ async function loadMyListings() {
         const payload = JSON.parse(atob(token.split('.')[1]));
         email = payload.email;
     } catch (e) {
-        window.location.href = '/frontend/authorization/authorization.html';
+        window.location.href = '/auth';
         return [];
     }
     try {
@@ -35,7 +35,7 @@ function renderListings(listings) {
         return;
     }
     container.innerHTML = listings.map(listing => {
-        const img = imagesMap[listing.id] || 'image1.jpg';
+        const img = imagesMap[listing.id] || '/frontend/personal_acc/image1.jpg';
         const priceNum = parseInt(listing.price) || 0;
         const title = `${translateType(listing.type)} — ${listing.city}`;
         const description = listing.description || listing.comment || '';
@@ -75,7 +75,7 @@ function closeAddModal() {
     document.body.style.overflow = '';
     document.getElementById('add-form')?.reset();
     const preview = document.getElementById('preview-image');
-    if (preview) preview.src = 'download-icon.png';
+    if (preview) preview.src = '/frontend/personal_acc/download-icon.png';
 }
 
 async function reloadListings() {
@@ -228,7 +228,7 @@ let viewModalLoaded = false;
 async function openViewModal(listing) {
     if (!viewModalLoaded) {
         try {
-            const response = await fetch('view-modal.html');
+            const response = await fetch('/frontend/personal_acc/view-modal.html');
             const html = await response.text();
             document.body.insertAdjacentHTML('beforeend', html);
             viewModalLoaded = true;
@@ -244,16 +244,18 @@ async function openViewModal(listing) {
     document.getElementById('modal-price').textContent = (parseInt(listing.price)||0).toLocaleString();
     document.getElementById('modal-description').textContent = listing.description || listing.comment || '';
     document.getElementById('modal-user-comment').textContent = listing.user_comment || '';
-    document.getElementById('modal-image').src = imagesMap[listing.id] || 'image1.jpg';
-    document.getElementById('view-modal').style.display = 'block';
+    document.getElementById('modal-image').src = imagesMap[listing.id] || '/frontend/personal_acc/image1.jpg';
+    const vm = document.getElementById('view-modal');
+    vm.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
     setupViewModalClose();
 }
 
 function setupViewModalClose() {
     const modal = document.getElementById('view-modal');
     if (!modal.dataset.initialized) {
-        modal.querySelector('.close')?.addEventListener('click', () => { modal.style.display = 'none'; });
-        window.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
+        modal.querySelector('.close')?.addEventListener('click', () => { modal.style.display = 'none'; document.body.style.overflow=''; });
+        window.addEventListener('click', (e) => { if (e.target === modal) { modal.style.display = 'none'; document.body.style.overflow=''; } });
         modal.dataset.initialized = 'true';
     }
 }
