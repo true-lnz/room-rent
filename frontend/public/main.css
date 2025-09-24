@@ -69,12 +69,12 @@ body {
 }
 
 .header__btn {
-    margin-left: auto;   /* кнопка вправо */
+    margin-left: auto;
 }
 
 .nav {
     display: flex;
-    gap: 2rem;          /* это расстояние между ссылками */
+    gap: 2rem;
     align-items: center;
 }
 .nav__item {
@@ -216,7 +216,6 @@ footer a:hover {
     outline-color: var(--primary);
 }
 
-/* Общие стили модальных окон */
 .modal {
     display: none;
     position: fixed;
@@ -255,7 +254,6 @@ footer a:hover {
     background: #ddd;
 }
 
-/* Общие утилиты */
 .no-results { 
     color: #666; 
     padding: 16px; 

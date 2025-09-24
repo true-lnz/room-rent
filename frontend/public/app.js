@@ -1,4 +1,3 @@
-// Общие вспомогательные функции фронтенда
 window.App = (function(){
     function getToken(){
         return localStorage.getItem('token') || '';

@@ -1,4 +1,3 @@
-// Загрузка моих объявлений из API и рендер
 async function loadMyListings() {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -56,8 +55,6 @@ function renderListings(listings) {
         </div>`;
     }).join('');
 }
-
-// --- ДОБАВЛЕНИЕ НОВОГО ОБЪЯВЛЕНИЯ ---
 
 function checkAuth() {
     const token = localStorage.getItem('token');
@@ -124,7 +121,6 @@ function setupAddModal() {
                 user_email: userEmail
             };
 
-            // Валидация описания: 10..100 символов
             const descLen = formData.description.length;
             if (descLen < 10 || descLen > 100) {
                 alert('Описание обязательно. Длина должна быть от 10 до 100 символов.');
@@ -266,8 +262,6 @@ function setupViewModalClose() {
         modal.dataset.initialized = 'true';
     }
 }
-
-// --- ИНИЦИАЛИЗАЦИЯ ---
 
 document.addEventListener('DOMContentLoaded', async () => {
     listingsData = await loadMyListings();

@@ -12,9 +12,7 @@
 
 <div class="container">
     <h1>Мои объявления</h1>
-    <div class="listings" id="listings-container">
-        <!-- Будет заполнено через JavaScript -->
-    </div>
+    <div class="listings" id="listings-container"></div>
 
     <div class="actions">
         <button id="open-add-modal" class="btn btn-primary">Новое объявление</button>
@@ -24,7 +22,6 @@
 
 {{template "footer"}}
 
-<!-- Модальное окно добавления нового объявления -->
 <div id="add-modal" class="modal">
     <div class="modal-content large-modal">
         <span class="close" id="close-add-modal">&times;</span>
@@ -83,7 +80,6 @@
     </div>
 </div>
 
-<!-- Модальное окно редактирования -->
 <div id="edit-modal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
@@ -121,7 +117,6 @@
     </div>
 </div>
 
-<!-- Модальное окно подтверждения удаления -->
 <div id="delete-modal" class="modal">
     <div class="modal-content">
         <span class="close" id="delete-close">&times;</span>

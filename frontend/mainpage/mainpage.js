@@ -35,7 +35,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         return;
     }
 
-    // Загружаем объявления с сервера
     let listingsData = [];
     let imagesMap = {};
     try {
@@ -49,7 +48,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         //
     }
 
-    // Загрузим первое изображение для каждого объявления
     try {
         await Promise.all((listingsData || []).map(async (l) => {
             try {
@@ -64,7 +62,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }));
     } catch (_) {}
 
-    // Справочники отображения
     const getTypeName = (code) => ({
         storage: 'Кладовка',
         office: 'Офис',
@@ -96,11 +93,9 @@ document.addEventListener('DOMContentLoaded', async function() {
         return v; // если уже код
     };
 
-    // Инициализация
     renderListings(listingsData);
 
 
-    // Тоггл фильтров
     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.stopPropagation();
@@ -116,7 +111,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    // Закрытие по клику вне модалки
     window.addEventListener('click', (e) => {
         const modal = document.getElementById('modal');
         if (e.target === modal) {
@@ -124,7 +118,6 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    // Закрытие по клику на кнопку закрытия
     const closeBtn = document.querySelector('.close-btn');
     if (closeBtn) {
         closeBtn.addEventListener('click', () => {
@@ -132,10 +125,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // Текущее объявление для бронирования
     let currentListingId = null;
 
-    // Форма бронирования
     const bookingForm = document.querySelector('.booking-form');
     if (bookingForm) {
         bookingForm.addEventListener('submit', async (e) => {

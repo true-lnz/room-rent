@@ -27,7 +27,6 @@
     font-size: 16px;
     color: #333;
 }
-/* Кнопки */
 .btn {
     padding: 8px 15px;
     border-radius: 6px;
@@ -92,16 +91,6 @@
     margin: 20px 15px;
 }
 
-
-
-
-
-
-
-
-
-
-
 .listings {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -144,8 +133,6 @@
     margin: 0 0 8px 0;
 }
 
-
-
 .modal-body p {
     line-height: 1.5;
 }
@@ -185,7 +172,6 @@
     margin-top: 8px;
 }
 
-/* Модальное окно */
 .modal {
     display: none;
     position: fixed;
@@ -208,7 +194,6 @@
     position: relative;
 }
 
-/* Более крупная модалка для формы добавления */
 .large-modal { max-width: 980px; }
 
 .image-upload { display: flex; flex-direction: column; align-items: center; gap: 8px; }
