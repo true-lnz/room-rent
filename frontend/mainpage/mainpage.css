@@ -305,3 +305,84 @@
 label {
     color: #424242;
 }
+
+
+
+/* --- Как это работает --- */
+#how-it-works {
+    padding: 2rem 0;
+    text-align: center;
+}
+#how-it-works h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+.steps {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+}
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+    background: #fff;
+    border-radius: 15px;
+    padding: 2rem;
+    border: 1px solid var(--border);
+}
+
+.step p {
+    font-size: .95rem;
+    color: var(--text-dark);
+}
+.step-number {
+    display: inline-block;
+    background: var(--primary);
+    color: #fff;
+    font-weight: bold;
+    font-size: 1.2rem;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+}
+
+/* --- FAQ --- */
+#faq {
+    padding: 4rem 0;
+}
+#faq h2 {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+
+.accordion-header {
+    width: 100%;
+    text-align: left;
+    padding: 1.5rem 1rem;
+    font-size: 1.2rem;
+    background: #ffffff;
+    border: 1px solid var(--border);
+    outline: none;
+    cursor: pointer;
+    transition: border .3s ease;
+}
+.accordion-header:hover {
+    border: 1px solid var(--primary);
+}
+.accordion-content {
+    color: var(--text-dark);
+    max-height: 0;
+    overflow: hidden;
+    padding: 0 1rem;
+    background: rgba(0, 0, 0, 0.05);
+    transition: max-height .3s ease, padding .3s ease;
+}
+.accordion-item.active .accordion-content {
+    max-height: 200px; /* ограничение, можно увеличить */
+    padding: 1rem;
+}
