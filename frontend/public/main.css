@@ -18,7 +18,7 @@
 
 body {
     margin: 0 20rem;
-    font-family: Arial, sans-serif; 
+    font-family: Arial, sans-serif;
     background-color: var(--secondary);
 }
 
@@ -33,8 +33,11 @@ body {
 }
 
 .main-content {
+    display: flex;
+    flex-direction: column;
     flex: 1 0 auto;
     width: 100%;
+    padding-bottom: 4rem;
 }
 
 .header {
@@ -123,7 +126,11 @@ body {
 }
 
 footer {
-    position: static;
+    /* position: absolute; ← ЗАКОММЕНТИРУЙ ЭТО */
+    /* bottom: 0; ← ЗАКОММЕНТИРУЙ ЭТО */
+    /* left: 0; ← ЗАКОММЕНТИРУЙ ЭТО */
+    /* right: 0; ← ЗАКОММЕНТИРУЙ ЭТО */
+
     width: 100%;
     background-color: var(--secondary);
     border-top: 1px solid var(--border);
@@ -134,8 +141,8 @@ footer {
     gap: 2rem;
     color: var(--text-muted);
     font-size: 0.9rem;
-    margin-top: 24px;
     flex-shrink: 0;
+    z-index: 1000;
 }
 
 footer a {
@@ -221,7 +228,7 @@ footer a:hover {
     position: fixed;
     top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.35);
-    z-index: 1000;
+    z-index: 2000;
     align-items: center;
     justify-content: center;
 }
@@ -238,9 +245,9 @@ footer a:hover {
 .close-btn {
     position: absolute;
     top: 8px; right: 8px;
-    border: 0; 
-    background: #eee; 
-    width: 28px; 
+    border: 0;
+    background: #eee;
+    width: 28px;
     height: 28px;
     border-radius: 6px;
     cursor: pointer;
@@ -254,9 +261,9 @@ footer a:hover {
     background: #ddd;
 }
 
-.no-results { 
-    color: #666; 
-    padding: 16px; 
+.no-results {
+    color: #666;
+    padding: 16px;
     text-align: center;
     font-style: italic;
 }
